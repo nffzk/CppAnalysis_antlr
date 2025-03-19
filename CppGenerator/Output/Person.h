@@ -19,7 +19,7 @@
 #include "Realization1"
 #include "Realization1"
 // 聚合关系
-#include "Address"
+#include "Address
 
 // 关联关系
 class Company2;
@@ -73,34 +73,39 @@ public:
 	static std::string staticfun();
 	
 	/**
-	* @brief 
+	* @brief  std::string 
 	*/
 	std::string name1 = "Tom";
 	
 	/**
-	* @brief 
+	* @brief  std::string 
 	*/
 	std::string name3[3];
 	
 	/**
-	* @brief 
+	* @brief  std::string 
 	*/
 	std::vector<std::string> name4;
 	
 	/**
-	* @brief 
+	* @brief  std::string 
 	*/
 	static std::vector<std::string> name5;
 	
 	/**
-	* @brief 
+	* @brief  std::string 
 	*/
 	static std::string name6;
 	
 	/**
-	* @brief 
+	* @brief   class1
 	*/
-	static std::string name7[3];
+	static class1 name7[3];
+	
+	/**
+	* @brief   class2
+	*/
+	static class2 name8[3];
 	
 	/**
 	* @brief 组合关系和聚合关系作为成员变量 employer1
@@ -125,12 +130,12 @@ public:
 private:
 	
 	/**
-	* @brief 
+	* @brief  int 
 	*/
 	int age;
 	
 	/**
-	* @brief 
+	* @brief  bool 
 	*/
 	bool name2 = "Tom1";
 

@@ -40,12 +40,12 @@ public:
 	virtual ~Node();
 	
 	/**
-	* @brief 
+	* @brief  Node 
 	*/
 	Node left;
 	
 	/**
-	* @brief 
+	* @brief  Node 
 	*/
 	Node right;
 	

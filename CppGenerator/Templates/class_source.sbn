@@ -81,12 +81,12 @@ end }}
 {{- if m.IsPureVirtual != true }}
 {{- "\n\n" -}}
 {{- # 处理返回类型 -}}
-{{- returntype = (m.ReturnType != null) ? m.ReturnType : m.CustomReturnType -}}
+{{- returntype = (m.ReturnType != null && m.ReturnType.size > 0) ? m.ReturnType : m.CustomReturnType -}}
 {{- if returntype == null || returntype == "" -}}
 {{-   returntype = "void" -}}
 {{- end -}}
 
-{{ returntype }} {{ c.Name }}::{{ m.Name }}({{ if m.Parameters != null && m.Parameters.size > 0 }}{{ for p in m.Parameters }}{{ if !for.first }}, {{ end }}{{ ptype = (p.Type != null) ? p.Type : p.CustomType }}{{ ptype }} {{ p.Name }}{{ end }}{{ end }})
+{{ returntype }} {{ c.Name }}::{{ m.Name }}({{ if m.Parameters != null && m.Parameters.size > 0 }}{{ for p in m.Parameters }}{{ if !for.first }}, {{ end }}{{ ptype = (p.Type != null && p.Type.size > 0) ? p.Type : p.CustomType }}{{ ptype }} {{ p.Name }}{{ end }}{{ end }})
 {
 
 }
@@ -101,7 +101,7 @@ end }}
     {{- if p.IsStatic == true }}
         {{- "\n\n" -}}
         {{- # 处理类型 -}}
-        {{- ptype = (p.Type != null) ? p.Type : p.CustomType -}}
+        {{- ptype = (p.Type != null && p.Type.size > 0) ? p.Type : p.CustomType -}}
          {{- map_mult ptype p.Name false p.Multiplicity -}}
         {{- # 只有单对象时允许类内默认值，且不是static类型 -}}
         {{- if p.DefaultValue != null && p.DefaultValue != "" && (p.Multiplicity == null || (p.Multiplicity.Item1 == "1" && p.Multiplicity.Item2 == "1")) && p.IsStatic  -}} 

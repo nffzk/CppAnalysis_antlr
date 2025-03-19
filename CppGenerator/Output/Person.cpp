@@ -45,5 +45,7 @@ std::vector<std::string> name5;
 
 std::string name6 = "default";
 
-std::string name7[3];
+ name7[3];
+
+class2 name8[3];
 
