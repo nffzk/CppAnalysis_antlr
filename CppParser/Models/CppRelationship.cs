@@ -28,7 +28,7 @@ namespace CppParser.Models
         /// <summary>
         /// 成员名
         /// </summary>
-        public string RoleName { get; set; }          // 成员名
+        public string RoleName { get; set; }          
     }
 
     /// <summary>
