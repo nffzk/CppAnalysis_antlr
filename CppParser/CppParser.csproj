@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+    <PackageReference Include="Antlr4BuildTasks" Version="12.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Grammars\Generated\" />
+    <Folder Include="tools\" />
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="if not exist &quot;$(ProjectDir)Grammars\Generated&quot; mkdir &quot;$(ProjectDir)Grammars\Generated&quot;&#xD;&#xA;java -jar &quot;$(ProjectDir)tools\antlr-4.13.2-complete.jar&quot; -Dlanguage=CSharp -visitor -listener -o &quot;$(ProjectDir)Grammars\Generated&quot; -package CppParser.Grammars.Generated &quot;$(ProjectDir)Grammars\CPP14Lexer.g4&quot;&#xD;&#xA;java -jar &quot;$(ProjectDir)tools\antlr-4.13.2-complete.jar&quot; -Dlanguage=CSharp -visitor -listener -o &quot;$(ProjectDir)Grammars\Generated&quot; -package CppParser.Grammars.Generated &quot;$(ProjectDir)Grammars\CPP14Parser.g4&quot;" />
+  </Target>
+
+</Project>
