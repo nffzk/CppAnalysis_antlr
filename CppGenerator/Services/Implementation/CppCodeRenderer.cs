@@ -1,6 +1,7 @@
 ﻿using Scriban;
 using Scriban.Runtime;
 using CppParser.Models;
+using CppParser.Enums;
 
 namespace CppGenerator.Services
 {
@@ -35,9 +36,28 @@ namespace CppGenerator.Services
         {
             var tctx = new TemplateContext { MemberRenamer = m => m.Name };
             var g = new ScriptObject();
-            g.SetValue("c", c, true); 
+
+            // 1) 计算是否需要 protected 区
             bool hasProtectedSection =
-            bool hasPrivateSection = 
+                (c.Methods?.Any(m => m.Visibility == EnumVisibility.Protected) ?? false)
+                ||
+                (c.Properties?.Any(p => p.Visibility == EnumVisibility.Protected) ?? false)
+                ||
+                (c.Associations?.Any(a => a.Visibility == EnumVisibility.Protected) ?? false);
+
+            // 2) 计算是否需要 private 区
+            bool hasPrivateSection =
+                (c.Methods?.Any(m => m.Visibility == EnumVisibility.Private) ?? false)
+                ||
+                (c.Properties?.Any(p => p.Visibility == EnumVisibility.Private) ?? false)
+                ||
+                (c.Associations?.Any(a => a.Visibility == EnumVisibility.Private) ?? false);
+
+
+            // 3) 推入模板上下文
+            g.SetValue("c", c, true);
+            g.SetValue("HAS_PROTECTEDSECTION", hasProtectedSection, true);
+            g.SetValue("HAS_PRIVATESECTION", hasPrivateSection, true);
 
             tctx.PushGlobal(g);
             return tctx;

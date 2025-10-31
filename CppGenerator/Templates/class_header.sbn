@@ -125,7 +125,7 @@ public:
     {{- end }}
     {{- end }}
 
-{{- if $HAS_PROTECTEDSECTION }}
+{{- if HAS_PROTECTEDSECTION }}
 
 protected:
     {{- # —— protected 区 —— -}}
@@ -202,7 +202,7 @@ protected:
 {{- end }}
 
 
-{{- if $HAS_PRIVATEDSECTION }}
+{{- if HAS_PRIVATESECTION }}
 
 private:
     {{- # —— private 区 —— -}}

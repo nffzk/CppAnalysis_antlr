@@ -20,6 +20,12 @@ public:
 
     std::string name1 = "Tom";
 
+private:
+
+    int age;
+
+    std::string name2 = "Tom1";
+
 };
 
 #endif
