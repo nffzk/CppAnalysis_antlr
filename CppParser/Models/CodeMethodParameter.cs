@@ -11,6 +11,6 @@ namespace CppParser.Models
         /// <summary>
         /// 参数传递方向，inout.in out。默认inout
         /// </summary>
-        public string direction { get; set; } = "inout";
+        public string Direction { get; set; } = "inout";
     }
 }
