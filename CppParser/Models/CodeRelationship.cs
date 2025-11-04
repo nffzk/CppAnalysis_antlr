@@ -11,6 +11,11 @@ namespace CppParser.Models
     public abstract class CodeRelationship
     {
         /// <summary>
+        /// 源名（class、struct、interface类名）
+        /// </summary>
+        public string Source { get; set; }
+
+        /// <summary>
         /// 目标名（class、struct、interface类名）
         /// </summary>
         public string Target { get; set; }
@@ -21,19 +26,44 @@ namespace CppParser.Models
         public EnumClassType TargetEnum { get; set; }
 
         /// <summary>
-        /// 多重性
+        /// source多重性
         /// </summary>
-        public EnumCppMultiplicity Multiplicity { get; set; }
+        public EnumCppMultiplicity SourceMultiplicity { get; set; }
 
         /// <summary>
-        /// 多重性固定大小（如有的话）
+        /// 记录原型中source多重性的字符串表示
         /// </summary>
-        public int? FixedSize { get; set; } 
+        public string SourceMarkMultiplicity { get; set; }
 
         /// <summary>
-        /// 成员名
+        /// source多重性固定大小（如有的话）
         /// </summary>
-        public string RoleName { get; set; }          
+        public int? SouceFixedSize { get; set; }
+
+        /// <summary>
+        /// target多重性
+        /// </summary>
+        public EnumCppMultiplicity TargetMultiplicity { get; set; }
+
+        /// <summary>
+        /// 记录原型中target多重性的字符串表示
+        /// </summary>
+        public string TargetMarkMultiplicity { get; set; }
+
+        /// <summary>
+        /// target多重性固定大小（如有的话）
+        /// </summary>
+        public int? targetFixedSize { get; set; }
+
+        /// <summary>
+        /// source成员名
+        /// </summary>
+        public string SourceRoleName { get; set; }
+
+        /// <summary>
+        /// target成员名
+        /// </summary>
+        public string TargetRoleName { get; set; }
     }
 
     /// <summary>
@@ -49,14 +79,26 @@ namespace CppParser.Models
     /// <summary>
     /// 依赖
     /// </summary>
-    public class CodeDependency : CodeRelationship { }
-
-    /// 使用关系
+    public class CodeDependency : CodeRelationship 
+    {
+        public EnumDenpencyType Type { get; set; } = EnumDenpencyType.Denpency;
+    }
 
     /// <summary>
-    /// 关联
+    /// 双向关联
     /// </summary>
     public class CodeAssociation : CodeRelationship 
+    {
+        /// <summary>
+        /// 可见性
+        /// <summary>
+        public EnumVisibility Visibility { get; set; } = EnumVisibility.Public;
+    }
+
+    /// <summary>
+    /// 单向关联
+    /// </summary>
+    public class CodeUnidirectionalAssociation : CodeRelationship
     {
         /// <summary>
         /// 可见性

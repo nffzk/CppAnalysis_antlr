@@ -26,6 +26,11 @@ namespace CppParser.Models
         public EnumCppMultiplicity Multiplicity { get; set; }
 
         /// <summary>
+        /// 记录原型中多重性的字符串表示
+        /// </summary>
+        public string MarkMultiplicity { get; set; }
+
+        /// <summary>
         /// 是否为静态属性
         /// </summary>
         public bool IsStatic { get; set; }

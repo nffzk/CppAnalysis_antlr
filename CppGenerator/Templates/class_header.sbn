@@ -15,42 +15,87 @@
 {{- $MULT_FIXED  = 2 -}}
 {{- $MULT_MANY   = 3 -}}
 
+{{- $TYPE_NONE           = 0 -}}
+{{- $TYPE_CLASS          = 1 -}}
+{{- $TYPE_STRUCT         = 2 -}}
+{{- $TYPE_INTERFACE      = 3 -}}
+{{- $TYPE_ABSTRACTCLASS  = 4 -}}
+
 
 {{- "\n" -}}
-{{- # === 依赖头文件 === -}}
-{{- if c.Dependencies != null && c.Dependencies.size > 0 }}
-{{- for d in c.Dependencies }}
-#include "{{ d.TargetClass }}"
+{{- # === 头文件 === -}}
+
+{{- # === 泛化关系 === -}}
+{{- if c.Generalizations != null && c.Generalizations.size > 0 }}
+// 泛化关系
+{{- for d in c.Generalizations }}
+#include "{{ d.Target }}"
 {{- end }}
 {{- end }}
 
-{{- if c.Associations != null && c.Associations.size > 0 }}
-{{- for a in c.Associations }}
-#include "{{ a.TargetClass }}"
+{{- # === 实现关系 === -}}
+{{- if c.Realizations != null && c.Realizations.size > 0 }}
+// 实现关系
+{{- for d in c.Realizations }}
+#include "{{ d.Target }}"
+{{- end }}
+{{- end }}
+
+{{- # === 依赖关系 === -}}
+{{- if c.Dependencies != null && c.Dependencies.size > 0 }}
+// 依赖关系
+{{- for d in c.Dependencies }}
+#include "{{ d.Target }}"
+{{- end }}
+{{- end }}
+
+{{- # === 组合关系 === -}}
+{{- if c.Compositions != null && c.Compositions.size > 0 }}
+// 组合关系
+{{- for d in c.Compositions }}
+#include "{{ d.Target }}"
+{{- end }}
+{{- end }}
+
+{{- # === 聚合关系 === -}}
+{{- if c.Aggregations != null && c.Aggregations.size > 0 }}
+// 聚合关系
+{{- for d in c.Aggregations }}
+#include "{{ d.Target }}"
 {{- end }}
 {{- end }}
 
 {{- "\n" -}}
 {{- # === 前置声明 === -}}
-{{- if c.Dependencies != null && c.Dependencies.size > 0 }}
-{{- for d in c.Dependencies }}
-class {{ d.TargetClass }};
+
+{{- # === 关联关系 === -}}
+{{- if c.Associations != null && c.Associations.size > 0 }}
+// 关联关系
+{{- for a in c.Associations }}
+{{- # 定义类型变量 -}}
+{{- target_type = c.Associations.TargetEnum == $TYPE_STRUCT ? "struct" : "class" }}
+{{ target_type }} {{ a.Target }};
 {{- end }}
 {{- end }}
 
-{{- if c.Associations != null && c.Associations.size > 0 }}
-{{- for a in c.Associations }}
-class {{ a.TargetClass }};
+{{- # === 类声明（继承来自 Generalizations/Realizations） === -}}
+{{- # 合并所有基类 -}}
+{{- all_base_classes = [] }}
+{{- if c.Generalizations != null }}
+{{-   all_base_classes = all_base_classes | array.add_range c.Generalizations }}
 {{- end }}
-{{- end }}
+{{- if c.Realizations != null }}
+{{-   all_base_classes = all_base_classes | array.add_range c.Realizations }}
+{{- end -}}
 
 {{- "\n" -}}
-{{- # === 类声明（继承来自 Generalizations） === -}}
-class {{ c.Name }}{{ if c.Generalizations != null && c.Generalizations.size > 0 }} : {{ for g in c.Generalizations }}{{ if !for.first }}, {{ end }}public {{ g.TargetClass }}{{ end }}{{ end }}
+class {{ c.Name }}{{ if all_base_classes.size > 0 }} : {{ for base in all_base_classes }}{{ if !for.first }}, {{ end }}public {{ base.Target }}{{ end }}{{ end }}
 {
 
+{{- if HAS_PUBLICSECTION }}
+
 public:
-    {{- # —— public 区 —— -}}
+    {{- # === public 区 === -}}
     {{- "\n" }}
     {{ c.Name }}(); 
     
@@ -59,20 +104,18 @@ public:
     {{- # 非静态成员函数（public） -}}
     {{- if c.Methods != null && c.Methods.size > 0 }}
     {{- for m in c.Methods }}
-    {{- $is_public = (m.Visibility == $VIS_PUBLIC) -}}
-    {{- $is_ctor   = (m.Name == c.Name) -}}
-    {{- $is_dtor   = string.starts_with m.Name "~" -}}
-    {{- $is_static = (m.IsStatic == true) -}}
-    {{- if $is_public && !$is_ctor && !$is_dtor && !$is_static }}
-    {{- "\n" }}
-    {{ m.ReturnType }} {{ m.Name }}(
-        {{- if m.Parameters != null && m.Parameters.size > 0 -}}
-            {{- for p in m.Parameters -}}
+    {{- $is_public = (m.Visibility == $VIS_PUBLIC) }}
+    {{- $is_static = (m.IsStatic == true) }}
+    {{- if $is_public  && !$is_static }}
+    {{- "\n" -}}
+    {{- returntype = m.ReturnType != null ? m.ReturnType : m.CustomReturnType }}
+    {{ returntype }} {{ m.Name }}(
+        {{- if m.Parameters != null && m.Parameters.size > 0 }}
+            {{- for p in m.Parameters }}
                 {{- if !for.first }}, {{ end -}}
                 {{ p.Type }} {{ p.Name }}
-            {{- end -}}
-        {{- end -}}
-    ){{ if m.IsConst == true }} const{{ end }};
+            {{- end }}
+        {{- end }});
     {{- end }}
     {{- end }}
     {{- end }}
@@ -80,16 +123,18 @@ public:
     {{- # 静态成员函数（public） -}}
     {{- if c.Methods != null && c.Methods.size > 0 }}
     {{- for m in c.Methods }}
-    {{- if (m.Visibility == $VIS_PUBLIC) && (m.IsStatic == true) && (m.Name != c.Name) && (!string.starts_with m.Name "~") }}
-    {{- "\n" }}
-    {{ m.ReturnType }} {{ m.Name }}(
-        {{- if m.Parameters != null && m.Parameters.size > 0 -}}
-            {{- for p in m.Parameters -}}
+    {{- $is_public = (m.Visibility == $VIS_PUBLIC) }}
+    {{- $is_static = (m.IsStatic == true) }}
+    {{- if $is_public  && $is_static }}
+    {{- "\n" -}}
+    {{- returntype = m.ReturnType != null ? m.ReturnType : m.CustomReturnType }}
+    static {{ returntype }} {{ m.Name }}(
+        {{- if m.Parameters != null && m.Parameters.size > 0 }}
+            {{- for p in m.Parameters }}
                 {{- if !for.first }}, {{ end -}}
                 {{ p.Type }} {{ p.Name }}
-            {{- end -}}
-        {{- end -}}
-    );
+            {{- end }}
+        {{- end }});
     {{- end }}
     {{- end }}
     {{- end }}
@@ -124,6 +169,7 @@ public:
     {{- end }}
     {{- end }}
     {{- end }}
+{{- end }}
 
 {{- if HAS_PROTECTEDSECTION }}
 

@@ -16,4 +16,8 @@ void Person::setName(const std::string& v)
 {
 }
 
+std::string Person::staticfun()
+{
+}
+
 

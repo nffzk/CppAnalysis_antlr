@@ -43,7 +43,15 @@ namespace CppGenerator.Services
             var tctx = new TemplateContext { MemberRenamer = m => m.Name };
             var g = new ScriptObject();
 
-            // 1) 计算是否需要 protected 区
+            // 1) 计算是否需要 Public 区
+            bool hasPublicSection =
+                (c.Methods?.Any(m => m.Visibility == EnumVisibility.Public) ?? false)
+                ||
+                (c.Properties?.Any(p => p.Visibility == EnumVisibility.Public) ?? false)
+                ||
+                (c.Associations?.Any(a => a.Visibility == EnumVisibility.Public) ?? false);
+
+            // 2) 计算是否需要 protected 区
             bool hasProtectedSection =
                 (c.Methods?.Any(m => m.Visibility == EnumVisibility.Protected) ?? false)
                 ||
@@ -51,7 +59,7 @@ namespace CppGenerator.Services
                 ||
                 (c.Associations?.Any(a => a.Visibility == EnumVisibility.Protected) ?? false);
 
-            // 2) 计算是否需要 private 区
+            // 3) 计算是否需要 private 区
             bool hasPrivateSection =
                 (c.Methods?.Any(m => m.Visibility == EnumVisibility.Private) ?? false)
                 ||
@@ -62,8 +70,14 @@ namespace CppGenerator.Services
 
             // 3) 推入模板上下文
             g.SetValue("c", c, true);
+            if ( c.Stereotype == EnumClassType.Class )
+            {
+                hasPublicSection = true;
+            }
+            g.SetValue("HAS_PUBLICSECTION", hasPublicSection, true);
             g.SetValue("HAS_PROTECTEDSECTION", hasProtectedSection, true);
             g.SetValue("HAS_PRIVATESECTION", hasPrivateSection, true);
+
 
             tctx.PushGlobal(g);
             return tctx;

@@ -8,10 +8,11 @@ namespace CppParser.Models
 {
     public class CodeEnum : CodeElement
     {
+
         /// <summary>
-        /// 枚举值列表
+        /// key 枚举值，value 中文名称
         /// </summary>
-        public List<string> Values { get; set; } = new List<string>();
+        public Dictionary<string,string> Values { get; set; }
 
         /// <summary>
         /// 是否为 scoped enum（enum class）（没用到）

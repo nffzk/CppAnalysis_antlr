@@ -62,8 +62,34 @@ namespace CppGenerator
                         Parameters = new List<CodeMethodParameter> {
                             new() { Name = "v", Type = "const std::string&" }
                         }
-                    }
+                    },
+                    new CodeMethod { Name = "staticfun", ReturnType = "std::string", Visibility = EnumVisibility.Public , IsStatic = true},
+
+                },
+                Generalizations = new List<CodeGeneralization>
+                {
+                    new CodeGeneralization { Target = "LivingBeing1" },
+                    new CodeGeneralization { Target = "LivingBeing2" }
+                },
+
+                Realizations = new List<CodeRealization>
+                {
+                    new CodeRealization { Target = "Realization1" },
+                    new CodeRealization { Target = "Realization1" }
+                },
+
+                Aggregations = new List<CodeAggregation>
+                {
+                    new CodeAggregation {Target = "Address", Multiplicity = EnumCppMultiplicity.ToMany }
+                },
+
+                Associations = new List<CodeAssociation>
+                {
+                    new CodeAssociation {Target = "Company", Multiplicity = EnumCppMultiplicity.ToFixed, FixedSize=1, RoleName="employer", Visibility= EnumVisibility.Public }
                 }
+
+
+
             };
 
             var result = generator.GenerateClass(cppClass); // 只返回字符串

@@ -3,9 +3,10 @@
 
 enum class Color
 {
-  Red,
-  Green,
-  Blue
+	Red,
+	Green,
+	Blue,
+	black,
 };
 
 #endif

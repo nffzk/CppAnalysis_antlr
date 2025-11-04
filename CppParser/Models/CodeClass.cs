@@ -52,6 +52,11 @@ namespace CppParser.Models
         public List<CodeAssociation> Associations { get; set; } = new List<CodeAssociation>();
 
         /// <summary>
+        /// 类的关联关系
+        /// </summary>
+        public List<CodeUnidirectionalAssociation> UnidirectionaAssociations { get; set; } = new List<CodeUnidirectionalAssociation>();
+
+        /// <summary>
         /// 类的组合关系
         /// </summary>
         public List<CodeComposition> Compositions { get; set; } = new List<CodeComposition>();
