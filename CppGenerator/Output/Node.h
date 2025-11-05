@@ -14,9 +14,9 @@ public:
     
     virtual ~Node();
 
-	Node left;
+	Node left;;
 
-	Node right;
+	Node right;;
 
 };
 

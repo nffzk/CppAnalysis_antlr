@@ -11,6 +11,12 @@ namespace CppGenerator.Services
     /// </summary>
     public sealed class CppModelPreprocessor : ICppModelPreprocessor
     {
+
+
+
+
+
+
         // —— 类 —— //
         public CodeClass ProcessClass(CodeClass model)
         {
@@ -29,8 +35,8 @@ namespace CppGenerator.Services
                 .Concat(model.Compositions);
             foreach (var r in allRels)
             {
-                if (r.TargetMultiplicity == EnumCppMultiplicity.ToFixed && r.TargetFixedSize == null)
-                    r.TargetFixedSize = 1;
+                //if (r.TargetMultiplicity == EnumCppMultiplicity.ToFixed && r.TargetFixedSize == null)
+                //    r.TargetFixedSize = 1;
             }
 
             if (model.Methods != null)

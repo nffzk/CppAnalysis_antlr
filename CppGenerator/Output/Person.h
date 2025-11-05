@@ -13,7 +13,12 @@
 // 聚合关系
 #include "Address"
 
-// 关联关系
+enum test
+{
+	t,
+	t2,
+}
+
 class Company2;
 class Company3;
 class Company4;
@@ -26,7 +31,15 @@ public:
     
     virtual ~Person();
 
-	std::string name1 = "Tom";
+	std::string getName();
+
+	void setName(const std::string& v);
+
+	virtual std::string vfun() = 0;
+
+	static std::string staticfun();
+
+	std::string name1; = "Tom";
 
 	std::string name3[3];
 
@@ -38,33 +51,25 @@ public:
 
 	static std::string name7[3];
 
-	Company2* employer1[1];
+	std::vector<Address> employer1;
+
+	Company2* employer1[0];
 
 	std::vector<Company3*> employer2;
 
-	Company4* employer3;
+	Company4* employer3[3];
 
 	std::vector<Company5*> employer4;
 
-	Company6* employer5;
+	Company6* employer5[4];
 
-
-	int a[0];
-	int a[1];
-	vector<int> a;
-	int a;
-	vector<int> a;
-	vector<int> a;
-	// fixed = 4
-	int a[4];
-
-
+	test t1;
 
 private:
 
-	int age;
+	int age;;
 
-	std::string name2 = "Tom1";
+	std::string name2; = "Tom1";
 
 };
 

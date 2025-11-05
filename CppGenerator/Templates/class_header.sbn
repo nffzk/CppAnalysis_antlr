@@ -16,6 +16,32 @@
 {{- $TYPE_STRUCT         = 2 -}}
 {{- $TYPE_INTERFACE      = 3 -}}
 {{- $TYPE_ABSTRACTCLASS  = 4 -}}
+{{- $TYPE_ENUM           = 5 -}}
+
+{{- # === 多重性映射：根据 (lower, upper) 生成声明 === -}}
+{{- # 用法： map_mult type_name var_name is_static multiplicity_tuple -}}
+{{- func map_mult(type_name, var_name, is_static, multiplicity) -}}
+  {{- if multiplicity == null || multiplicity.Item1 == null || multiplicity.Item2 == null -}}
+    {{- if is_static }}static {{ end }}{{ type_name }} {{ var_name }};
+  {{- else -}}
+    {{- lower = multiplicity.Item1 -}}
+    {{- upper = multiplicity.Item2 -}}
+
+    {{- if (lower == "1") && (upper == "1") -}}
+      {{- if is_static }}static {{ end }}{{ type_name }} {{ var_name }}
+
+    {{- else if upper == "*" -}}
+      {{- if is_static }}static {{ end }}std::vector<{{ type_name }}> {{ var_name }}
+
+    {{- else -}}
+      {{- # 固定数组。像 0..1 这种也按 1 处理 -}}
+      {{- size_txt = upper -}}
+      {{- if is_static }}static {{ end }}{{ type_name }} {{ var_name }}[{{ size_txt }}]
+
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
 
 {{- "\n" -}}
 {{- # === 头文件 === -}}
@@ -65,20 +91,22 @@
 
 {{- # === 关联关系 === -}}
 {{- if c.Associations != null && c.Associations.size > 0 }}
-// 关联关系
 {{- for a in c.Associations }}
+{{- if c.Associations.TargetStereotype !=$TYPE_ENUM }}
 {{- # 定义类型变量 -}}
-{{- target_type = c.Associations.TargetEnum == $TYPE_STRUCT ? "struct" : "class" }}
+{{- target_type = c.Associations.TargetStereotype == $TYPE_STRUCT ? "struct" : "class" }}
 {{ target_type }} {{ a.TargetName }};
+{{- end }}
 {{- end }}
 {{- end }}
 
 {{- if c.UniDirectionalAssociations != null && c.UniDirectionalAssociations.size > 0 }}
-// 单向关联关系
 {{- for a in c.UniDirectionalAssociations }}
+{{- if c.UniDirectionalAssociations.TargetStereotype !=$TYPE_ENUM }}
 {{- # 定义类型变量 -}}
-{{- target_type = c.UniDirectionalAssociations.TargetEnum == $TYPE_STRUCT ? "struct" : "class" }}
+{{- target_type = c.UniDirectionalAssociations.TargetStereotype == $TYPE_STRUCT ? "struct" : "class" }}
 {{ target_type }} {{ a.TargetName }};
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -110,7 +138,6 @@ class {{ c.Name }}{{ if all_base_classes.size > 0 }} : {{ for base in all_base_c
         {{- "\n" -}}
         {{- returntype = (m.ReturnType != null) ? m.ReturnType : m.CustomReturnType -}}
         {{- "\n\t" -}}
-
         {{- if m.IsPureVirtual == true }}virtual {{ end -}}
         {{- if m.IsVirtual == true && m.IsPureVirtual != true }}virtual {{ end -}}
         {{- if m.IsStatic == true }}static {{ end -}}
@@ -131,50 +158,37 @@ class {{ c.Name }}{{ if all_base_classes.size > 0 }} : {{ for base in all_base_c
     {{- if c.Properties != null && c.Properties.size > 0 -}}
     {{- for p in c.Properties -}}
         {{- if p.Visibility == visibility -}}
-        {{- "\n" -}}
-
-        {{- # ---- ToOne：单对象 ---- -}}    
-        {{- if p.Multiplicity != null && p.Multiplicity  == $MULT_TO_ONE -}}
-            {{- "\n\t" -}}    
-            {{- ptype = (p.Type != null) ? p.Type : p.CustomType -}}
-            {{- if p.IsStatic == true -}}
-                static {{ ptype }} {{ p.Name }};
-            {{- else -}}
-                {{ ptype }} {{ p.Name }}{{ if p.DefaultValue != null && p.DefaultValue != "" }} = {{ p.DefaultValue }}{{ end }};
-            {{- end -}}
-
-        {{- # ---- ToFixed：固定长度数组 ---- -}}
-        {{- else if p.Multiplicity == $MULT_FIXED -}}
-            {{- $n = (p.FixedSize != null) ? p.FixedSize : 1 -}}
-            {{- "\n\t" -}}
-            {{- ptype = (p.Type != null) ? p.Type : p.CustomType -}}
-            {{- if p.IsStatic == true -}}
-                static {{ ptype }} {{ p.Name }}[{{ $n }}];
-            {{- else -}}
-                {{ ptype }} {{ p.Name }}[{{ $n }}];
-            {{- end -}}
-
-        {{- # ---- ToMany：可变多重 -> vector ---- -}}
-        {{- else if p.Multiplicity == $MULT_MANY -}}
-            {{- "\n\t" -}}
-            {{- ptype = (p.Type != null) ? p.Type : p.CustomType -}}
-            {{- if p.IsStatic == true -}}
-                static std::vector<{{ ptype }}> {{ p.Name }};
-            {{- else -}}
-                std::vector<{{ ptype }}> {{ p.Name }};
-            {{- end -}}
-
-        {{- # ---- 未标注多重性（兜底按 ToOne） ---- -}}
+        {{- "\n\n\t" -}}
+        {{- ptype = (p.Type != null) ? p.Type : p.CustomType -}}
+        {{- map_mult ptype p.Name p.IsStatic p.Multiplicity -}}
+        {{- # 只有单对象时允许类内默认值，且不是static类型 -}}
+        {{- if p.DefaultValue != null && p.DefaultValue != "" && (p.Multiplicity == null || (p.Multiplicity.Item1 == "1" && p.Multiplicity.Item2 == "1")) && !p.IsStatic  -}}
+            {{- }} = {{ p.DefaultValue }};
         {{- else -}}
-            {{- "\n\t" -}}
-            {{- ptype = (p.Type != null) ? p.Type : p.CustomType -}}
-            {{- if p.IsStatic == true -}}
-                static {{ ptype }} {{ p.Name }};
-            {{- else -}}
-                {{ ptype }} {{ p.Name }}{{ if p.DefaultValue != null && p.DefaultValue != "" }} = {{ p.DefaultValue }}{{ end }};
-            {{- end -}}
+            {{- }};
         {{- end -}}
+        {{- end -}}
+    {{- end -}}
+    {{- end -}}
 
+    {{- # 合并组合关系和聚合关系 -}}
+    {{- all_Compositions = [] }}
+    {{- if c.Compositions != null }}
+    {{-   all_Compositions = all_Compositions | array.add_range c.Compositions }}
+    {{- end }}
+    {{- if c.Aggregations != null }}
+    {{-   all_Compositions = all_Compositions | array.add_range c.Aggregations }}
+    {{- end -}}
+
+    {{- # ============ 关组合关系和聚合关系作为成员变量 ============ -}}
+    {{- if all_Compositions != null && all_Compositions.size > 0 -}}
+    {{- for a in all_Compositions -}}
+        {{- # 组合关系和聚合关系没有可见性默认放在public区域内}}
+        {{- if a != null && a.TargetName != null && visibility == 1 -}}
+        {{- "\n\n\t" -}}
+        {{- # 角色名兜底：优先用 TargetRoleName；没有就用 TargetName 名 -}}
+        {{- $role_raw  = (a.TargetRoleName != null && a.TargetRoleName != "") ? a.TargetRoleName : a.TargetName -}}
+        {{- map_mult a.TargetName $role_raw false a.TargetMultiplicity -}} {{- }};
         {{- end -}}
     {{- end -}}
     {{- end -}}
@@ -192,32 +206,14 @@ class {{ c.Name }}{{ if all_base_classes.size > 0 }} : {{ for base in all_base_c
     {{- if all_Associations != null && all_Associations.size > 0 -}}
     {{- for a in all_Associations -}}
         {{- if a != null && a.TargetName != null && a.Visibility == visibility -}}
-        {{- "\n" -}}
+        {{- "\n\n\t" -}}
         {{- # 角色名兜底：优先用 TargetRoleName；没有就用 TargetName 名 -}}
         {{- $role_raw  = (a.TargetRoleName != null && a.TargetRoleName != "") ? a.TargetRoleName : a.TargetName -}}
-
-        {{- if a.TargetMultiplicity == $MULT_TO_ONE -}}
-            {{- "\n\t" -}}
-            {{ a.TargetName }}* {{ $role_raw }};
-
-        {{- else if a.TargetMultiplicity == $MULT_FIXED -}}
-            {{- "\n\t" -}}
-            {{- $n = (a.FixedSize != null) ? a.FixedSize : 1 -}}    
-            {{ a.TargetName }}* {{ $role_raw }}[{{ $n }}];
-
-        {{- else if a.TargetMultiplicity == $MULT_MANY -}}
-            {{- "\n\t" -}}
-            std::vector<{{ a.TargetName }}*> {{ $role_raw }};
-
-        {{- else -}}
-            {{- "\n\t" -}}
-            {{- # 未标注多重性：兜底按 ToOne 指针 -}}
-            {{ a.TargetName }}* {{ $role_raw }};
-        {{- end -}}
-
+        {{- map_mult a.TargetName+"*" $role_raw false a.TargetMultiplicity -}} {{- }};
         {{- end -}}
     {{- end -}}
     {{- end -}}
+
 {{- end ~}}
 
 {{- if HAS_PUBLICSECTION }}

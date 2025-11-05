@@ -17,7 +17,7 @@ namespace CppGenerator
                 classHeaderTemplatePath: @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppGenerator\Templates\class_header.sbn",
                 classSourceTemplatePath: @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppGenerator\Templates\class_source.sbn",
                 enumHeaderTemplatePath: @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppGenerator\Templates\enum_header.sbn",
-                interfaceHeaderTemplatePath: @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppGenerator\Templates\interface_header.sbn",
+                interfaceHeaderTemplatePath: @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppGenerator\Templates\class_header.sbn",
                 structHeaderTemplatePath: @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppGenerator\Templates\class_header.sbn");
 
             var renderer = new CppCodeRenderer(tpl);
@@ -53,12 +53,12 @@ namespace CppGenerator
                     new CodeProperty { Name = "name1", Type = "std::string", Visibility = EnumVisibility.Public,  DefaultValue = "\"Tom\"" },
                     new CodeProperty { Name = "age",  Type = "int",          Visibility = EnumVisibility.Private },
                     new CodeProperty { Name = "name2", Type = "std::string", Visibility = EnumVisibility.Private,  DefaultValue = "\"Tom1\"" },
-                    new CodeProperty { Name = "name3", Type = "std::string", Visibility = EnumVisibility.Public,  Multiplicity = EnumCppMultiplicity.ToFixed ,FixedSize = 3},
-                    new CodeProperty { Name = "name4", Type = "std::string", Visibility = EnumVisibility.Public,  Multiplicity = EnumCppMultiplicity.ToMany ,DefaultValue = "\"default\""},
-                    new CodeProperty { Name = "name5", Type = "std::string", Visibility = EnumVisibility.Public,  Multiplicity = EnumCppMultiplicity.ToMany, IsStatic = true, DefaultValue = "\"default\""},
+                    new CodeProperty { Name = "name3", Type = "std::string", Visibility = EnumVisibility.Public,  Multiplicity = Tuple.Create("1", "3"), DefaultValue = "\"default\""},
+                    new CodeProperty { Name = "name4", Type = "std::string", Visibility = EnumVisibility.Public,  Multiplicity = Tuple.Create("1", "*") ,DefaultValue = "\"default\""},
+                    new CodeProperty { Name = "name5", Type = "std::string", Visibility = EnumVisibility.Public,  Multiplicity = Tuple.Create("1", "*"), IsStatic = true, DefaultValue = "\"default\""},
 
-                    new CodeProperty { Name = "name6", Type = "std::string", Visibility = EnumVisibility.Public,  Multiplicity = EnumCppMultiplicity.ToOne ,IsStatic = true, DefaultValue = "\"default\""},
-                    new CodeProperty { Name = "name7", Type = "std::string", Visibility = EnumVisibility.Public,  Multiplicity = EnumCppMultiplicity.ToFixed,FixedSize = 3, IsStatic = true, DefaultValue = "\"default\""},
+                    new CodeProperty { Name = "name6", Type = "std::string", Visibility = EnumVisibility.Public,  Multiplicity = Tuple.Create("1", "1") ,IsStatic = true, DefaultValue = "\"default\""},
+                    new CodeProperty { Name = "name7", Type = "std::string", Visibility = EnumVisibility.Public,  Multiplicity = Tuple.Create("1", "3"), IsStatic = true, DefaultValue = "\"default\""},
 
                 },
                 Methods = new List<CodeMethod>
@@ -91,20 +91,20 @@ namespace CppGenerator
 
                 Aggregations = new List<CodeAggregation>
                 {
-                    new CodeAggregation {TargetName = "Address", TargetMultiplicity = EnumCppMultiplicity.ToMany }
+                    new CodeAggregation {TargetName = "Address", TargetRoleName="employer1",TargetMultiplicity = Tuple.Create("1", "*") }
                 },
 
                 Associations = new List<CodeAssociation>
                 {
-                    new CodeAssociation {TargetName = "Company2", TargetMultiplicity = EnumCppMultiplicity.ToFixed, TargetFixedSize=1, TargetRoleName="employer1", Visibility= EnumVisibility.Public },
-                    new CodeAssociation {TargetName = "Company3", TargetMultiplicity = EnumCppMultiplicity.ToMany, TargetRoleName="employer2", Visibility= EnumVisibility.Public },
-                    new CodeAssociation {TargetName = "Company4", TargetMultiplicity = EnumCppMultiplicity.ToOne, TargetRoleName="employer3", Visibility= EnumVisibility.Public },
+                    new CodeAssociation {TargetName = "Company2", TargetMultiplicity = Tuple.Create("0", "0"), TargetRoleName="employer1", Visibility= EnumVisibility.Public },
+                    new CodeAssociation {TargetName = "Company3", TargetMultiplicity = Tuple.Create("1", "*"), TargetRoleName="employer2", Visibility= EnumVisibility.Public },
+                    new CodeAssociation {TargetName = "Company4", TargetMultiplicity = Tuple.Create("1", "3"), TargetRoleName="employer3", Visibility= EnumVisibility.Public },
                 },
 
                 UnidirectionalAssociations = new List<CodeUniDirectionalAssociation>
                 {
-                    new CodeUniDirectionalAssociation {TargetName = "Company5", TargetMultiplicity = EnumCppMultiplicity.ToMany, TargetRoleName="employer4", Visibility= EnumVisibility.Public },
-                    new CodeUniDirectionalAssociation {TargetName = "Company6", TargetMultiplicity = EnumCppMultiplicity.ToOne, TargetRoleName="employer5", Visibility= EnumVisibility.Public },
+                    new CodeUniDirectionalAssociation {TargetName = "Company5", TargetMultiplicity = Tuple.Create("1", "*"), TargetRoleName="employer4", Visibility= EnumVisibility.Public },
+                    new CodeUniDirectionalAssociation {TargetName = "Company6", TargetMultiplicity =Tuple.Create("4", "4"), TargetRoleName="employer5", Visibility= EnumVisibility.Public },
                 }
 
 

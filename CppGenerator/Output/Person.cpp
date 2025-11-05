@@ -30,9 +30,9 @@ std::string Person::staticfun()
 
 }
 
-std::vector<std::string> Person::name5;
+std::vector<std::string> name5;
 
-std::string Person::name6 = "default";
+std::string name6 = "default";
 
-std::string Person::name7[3] ;
+std::string name7[3];
 

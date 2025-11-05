@@ -1,5 +1,31 @@
 ﻿#include "{{ c.Name }}.h"
 
+{{- # === 多重性映射：根据 (lower, upper) 生成声明 === -}}
+{{- # 用法： map_mult type_name var_name is_static multiplicity_tuple -}}
+{{- func map_mult(type_name, var_name, is_static, multiplicity) -}}
+  {{- if multiplicity == null || multiplicity.Item1 == null || multiplicity.Item2 == null -}}
+    {{- if is_static }}static {{ end }}{{ type_name }} {{ var_name }};
+  {{- else -}}
+    {{- lower = multiplicity.Item1 -}}
+    {{- upper = multiplicity.Item2 -}}
+
+    {{- if (lower == "1") && (upper == "1") -}}
+      {{- if is_static }}static {{ end }}{{ type_name }} {{ var_name }}
+
+    {{- else if upper == "*" -}}
+      {{- if is_static }}static {{ end }}std::vector<{{ type_name }}> {{ var_name }}
+
+    {{- else -}}
+      {{- # 固定数组。像 0..1 这种也按 1 处理 -}}
+      {{- size_txt = upper -}}
+      {{- if is_static }}static {{ end }}{{ type_name }} {{ var_name }}[{{ size_txt }}]
+
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+
+
 {{- "\n" -}}
 {{- # === 关联关系 === -}}
 {{- if c.Associations != null && c.Associations.size > 0 }}
@@ -56,25 +82,14 @@
         {{- "\n\n" -}}
         {{- # 处理类型 -}}
         {{- ptype = (p.Type != null) ? p.Type : p.CustomType -}}
-        
-        {{- # 根据多重性处理不同的初始化方式 -}}
-        {{- if p.Multiplicity == 1 || p.Multiplicity == null || p.Multiplicity == 0 -}}
-            {{- # ToOne：单对象 -}}
-            {{ ptype }} {{ c.Name }}::{{ p.Name }}{{ if p.DefaultValue != null && p.DefaultValue != "" }} = {{ p.DefaultValue }}{{ end }};
-        
-        {{- else if p.Multiplicity == 2 -}}
-            {{- # ToFixed：固定长度数组 -}}
-            {{- $n = (p.FixedSize != null) ? p.FixedSize : 1 -}}
-            {{ ptype }} {{ c.Name }}::{{ p.Name }}[{{ $n }}] ;
-        
-        {{- else if p.Multiplicity == 3 -}}
-            {{- # ToMany：可变多重 -> vector -}}
-            std::vector<{{ ptype }}> {{ c.Name }}::{{ p.Name }};
-        
+         {{- map_mult ptype p.Name false p.Multiplicity -}}
+        {{- # 只有单对象时允许类内默认值，且不是static类型 -}}
+        {{- if p.DefaultValue != null && p.DefaultValue != "" && (p.Multiplicity == null || (p.Multiplicity.Item1 == "1" && p.Multiplicity.Item2 == "1")) && p.IsStatic  -}} 
+          {{- }} = {{ p.DefaultValue }};
         {{- else -}}
-            {{- # 默认情况 -}}
-            {{ ptype }} {{ c.Name }}::{{ p.Name }}{{ if p.DefaultValue != null && p.DefaultValue != "" }} = {{ p.DefaultValue }}{{ end }};
+            {{- }};
         {{- end }}
+
     {{- end }}
 {{- end }}
 {{- end }}
