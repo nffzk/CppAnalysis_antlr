@@ -1,3 +1,12 @@
+/**
+ * @noop Automatically Generated Header File
+ * @noop Copyright (C) 2025 shareetech.com
+ * 
+ * @file Person.h
+ * @brief 
+ * @author ShareE
+ */
+
 #ifndef _PERSON_H_
 #define _PERSON_H_
 
@@ -13,15 +22,15 @@
 // 聚合关系
 #include "Address"
 
-enum test
-{
-	t,
-	t2,
-}
-
 class Company2;
 class Company3;
 class Company4;
+
+/**
+ * @class Person
+ * @brief 
+ * @details 
+ */
 class Person : public LivingBeing1, public LivingBeing2, public Realization1, public Realization1
 {
 
@@ -31,44 +40,101 @@ public:
     
     virtual ~Person();
 
+	/**
+	* @brief 
+	* @return
+	*/
 	std::string getName();
 
+	/**
+	* @brief 
+	* @param v 
+	* @return
+	*/
 	void setName(const std::string& v);
 
+	/**
+	* @brief 
+	* @return
+	*/
 	virtual std::string vfun() = 0;
 
+	/**
+	* @brief 
+	* @return
+	*/
 	static std::string staticfun();
-
+	
+	/**
+	* @brief 
+	*/
 	std::string name1; = "Tom";
-
+	
+	/**
+	* @brief 
+	*/
 	std::string name3[3];
-
+	
+	/**
+	* @brief 
+	*/
 	std::vector<std::string> name4;
-
+	
+	/**
+	* @brief 
+	*/
 	static std::vector<std::string> name5;
-
+	
+	/**
+	* @brief 
+	*/
 	static std::string name6;
-
+	
+	/**
+	* @brief 
+	*/
 	static std::string name7[3];
-
+	
+	/**
+	* @brief 组合关系和聚合关系作为成员变量 employer1
+	*/
 	std::vector<Address> employer1;
-
+	
+	/**
+	* @brief 关联和单向关联作为成员变量 employer1
+	*/
 	Company2* employer1[0];
-
+	
+	/**
+	* @brief 关联和单向关联作为成员变量 employer2
+	*/
 	std::vector<Company3*> employer2;
-
+	
+	/**
+	* @brief 关联和单向关联作为成员变量 employer3
+	*/
 	Company4* employer3[3];
-
+	
+	/**
+	* @brief 关联和单向关联作为成员变量 employer4
+	*/
 	std::vector<Company5*> employer4;
-
+	
+	/**
+	* @brief 关联和单向关联作为成员变量 employer5
+	*/
 	Company6* employer5[4];
 
-	test t1;
-
 private:
-
+	
+	/**
+	* @brief 
+	*/
 	int age;;
-
+	
+	/**
+	* @brief 
+	*/
 	std::string name2; = "Tom1";
 
 };

@@ -1,3 +1,12 @@
+/**
+ * @noop Automatically Generated Header File
+ * @noop Copyright (C) 2025 shareetech.com
+ * 
+ * @file IShape.h
+ * @brief 
+ * @author ShareE
+ */
+
 #ifndef _ISHAPE_H_
 #define _ISHAPE_H_
 
@@ -5,6 +14,12 @@
 #include <vector>
 
 
+
+/**
+ * @class IShape
+ * @brief 
+ * @details 
+ */
 class IShape
 {
 
@@ -14,8 +29,16 @@ public:
     
     virtual ~IShape();
 
-	virtual double Area() = 0;
+	/**
+	* @brief 
+	* @return
+	*/
+	double Area();
 
+	/**
+	* @brief 
+	* @return
+	*/
 	virtual double Perimeter();
 
 };

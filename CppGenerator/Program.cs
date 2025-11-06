@@ -47,7 +47,7 @@ namespace CppGenerator
             var cppClass = new CodeClass
             {
                 Name = "Person",
-                Stereotype = EnumClassType.Class,
+                Stereotype = EnumClassType.Struct,
                 Properties = new List<CodeProperty>
                 {
                     new CodeProperty { Name = "name1", Type = "std::string", Visibility = EnumVisibility.Public,  DefaultValue = "\"Tom\"" },

@@ -1,19 +1,32 @@
-﻿#ifndef _{{ e.Name | string.upcase }}_H_
+﻿/**
+ * @noop Automatically Generated Header File
+ * @noop Copyright (C) 2025 shareetech.com
+ * 
+ * @file {{e.Name}}.h
+ * @brief 
+ * @author ShareE
+ */
+
+#ifndef _{{ e.Name | string.upcase }}_H_
 #define _{{ e.Name | string.upcase }}_H_
 
-{{- "\n" -}}
+{{- "\n\n" -}}
+/**
+ * @enum {{e.Name}}
+ * @brief {{e.Comment}}
+ */
 {{- if e.IsScoped }}
 enum class {{ e.Name }}{{ if e.UnderlyingType }} : {{ e.UnderlyingType }}{{ end }}
 {
   {{- for v in e.Values }}
-  {{ v.Key }}{{ if !for.last }},{{ end }}
+  {{ v.Key }}{{ if !for.last }},{{ end }}       ///< {{v.Value}}
   {{- end }}
 };
 {{- else }}
 enum {{ e.Name }}{{ if e.UnderlyingType }} : {{ e.UnderlyingType }}{{ end }}
 {
   {{- for v in e.Values }}
-  {{ v.Key }}{{ if !for.last }},{{ end }}
+  {{ v.Key }}{{ if !for.last }},{{ end }}      ///< {{v.Value}}
   {{- end }}
 };
 {{- end }}

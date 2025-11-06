@@ -1,4 +1,13 @@
-﻿#include "{{ c.Name }}.h"
+﻿/**
+ * @noop Automatically Generated Source File
+ * @noop Copyright (C) 2025 shareetech.com
+ * 
+ * @file {{c.Name}}.cpp
+ * @brief 
+ * @author ShareE
+ */
+
+#include "{{ c.Name }}.h"
 
 {{- # === 多重性映射：根据 (lower, upper) 生成声明 === -}}
 {{- # 用法： map_mult type_name var_name is_static multiplicity_tuple -}}

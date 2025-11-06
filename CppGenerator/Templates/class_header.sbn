@@ -1,4 +1,13 @@
-﻿#ifndef _{{ c.Name | string.upcase }}_H_
+﻿/**
+ * @noop Automatically Generated Header File
+ * @noop Copyright (C) 2025 shareetech.com
+ * 
+ * @file {{c.Name}}.h
+ * @brief 
+ * @author ShareE
+ */
+
+#ifndef _{{ c.Name | string.upcase }}_H_
 #define _{{ c.Name | string.upcase }}_H_
 
 #include <string>
@@ -120,7 +129,12 @@
 {{-   all_base_classes = all_base_classes | array.add_range c.Realizations }}
 {{- end -}}
 
-{{- "\n" -}}
+{{- "\n\n" -}}
+/**
+ * @class {{c.Name}}
+ * @brief {{c.Comment}}
+ * @details 
+ */
 class {{ c.Name }}{{ if all_base_classes.size > 0 }} : {{ for base in all_base_classes }}{{ if !for.first }}, {{ end }}public {{ base.TargetName }}{{ end }}{{ end }}
 {
 {{- # 定义可复用的成员内容函数 -}}
@@ -135,11 +149,21 @@ class {{ c.Name }}{{ if all_base_classes.size > 0 }} : {{ for base in all_base_c
     {{- if c.Methods != null && c.Methods.size > 0 -}}
     {{- for m in c.Methods -}}
         {{- if m.Visibility == visibility -}}
+
+        {{- # ===== 成员函数注释 ===== -}}
         {{- "\n" -}}
-        {{- returntype = (m.ReturnType != null) ? m.ReturnType : m.CustomReturnType -}}
+        {{- "\n\t" -}}  /**
+        {{- "\n\t" -}}  * @brief {{m.Comment}}
+        {{- for p in m.Parameters }}
+        {{- "\n\t" -}}  * @param {{ p.Name }} {{p.Comment}}
+        {{- end }}
+        {{- "\n\t" -}}  * @return 
+        {{- "\n\t" -}}  */
         {{- "\n\t" -}}
-        {{- if m.IsPureVirtual == true && m.IsVirtual != true m.IsStatic != true }}virtual {{ end -}}
-        {{- if m.IsVirtual == true && m.IsPureVirtual != true m.IsStatic != true }}virtual {{ end -}}
+
+        {{- returntype = (m.ReturnType != null) ? m.ReturnType : m.CustomReturnType -}}
+        {{- if m.IsPureVirtual == true && m.IsVirtual != true && m.IsStatic != true }}virtual {{ end -}}
+        {{- if m.IsVirtual == true && m.IsPureVirtual != true && m.IsStatic != true }}virtual {{ end -}}
         {{- if m.IsStatic == true }}static {{ end -}}
         {{- returntype }} {{ m.Name }}(
             {{- if m.Parameters != null && m.Parameters.size > 0 -}}
@@ -149,7 +173,7 @@ class {{ c.Name }}{{ if all_base_classes.size > 0 }} : {{ for base in all_base_c
                 {{ ptype }} {{ p.Name }}
             {{- end -}}
             {{- end -}}
-        ){{-  if m.IsPureVirtual == true && m.IsVirtual != true m.IsStatic != true }} = 0{{ end }};
+        ){{- if m.IsPureVirtual == true && m.IsVirtual != true && m.IsStatic != true }} = 0{{ end }};
         {{- end -}}
     {{- end -}}
     {{- end -}}
@@ -158,7 +182,14 @@ class {{ c.Name }}{{ if all_base_classes.size > 0 }} : {{ for base in all_base_c
     {{- if c.Properties != null && c.Properties.size > 0 -}}
     {{- for p in c.Properties -}}
         {{- if p.Visibility == visibility -}}
-        {{- "\n\n\t" -}}
+
+        {{- # ====== 成员注释 ====== -}}
+        {{- "\n\t" -}}
+        {{- "\n\t" -}}  /**
+        {{- "\n\t" -}}  * @brief {{p.Comment}}
+        {{- "\n\t" -}}  */
+        {{- "\n\t" -}}
+
         {{- ptype = (p.Type != null) ? p.Type : p.CustomType -}}
         {{- map_mult ptype p.Name p.IsStatic p.Multiplicity -}}
         {{- # 只有单对象时允许类内默认值，且不是static类型 -}}
@@ -185,9 +216,16 @@ class {{ c.Name }}{{ if all_base_classes.size > 0 }} : {{ for base in all_base_c
     {{- for a in all_Compositions -}}
         {{- # 组合关系和聚合关系没有可见性默认放在public区域内}}
         {{- if a != null && a.TargetName != null && visibility == 1 -}}
-        {{- "\n\n\t" -}}
         {{- # 角色名兜底：优先用 TargetRoleName；没有就用 TargetName 名 -}}
         {{- $role_raw  = (a.TargetRoleName != null && a.TargetRoleName != "") ? a.TargetRoleName : a.TargetName -}}
+
+        {{- # ====== 成员注释 ====== -}}
+        {{- "\n\t" -}}
+        {{- "\n\t" -}}  /**
+        {{- "\n\t" -}}  * @brief 组合关系和聚合关系作为成员变量 {{$role_raw}}
+        {{- "\n\t" -}}  */
+        {{- "\n\t" -}}
+
         {{- map_mult a.TargetName $role_raw false a.TargetMultiplicity -}} {{- }};
         {{- end -}}
     {{- end -}}
@@ -206,9 +244,16 @@ class {{ c.Name }}{{ if all_base_classes.size > 0 }} : {{ for base in all_base_c
     {{- if all_Associations != null && all_Associations.size > 0 -}}
     {{- for a in all_Associations -}}
         {{- if a != null && a.TargetName != null && a.Visibility == visibility -}}
-        {{- "\n\n\t" -}}
         {{- # 角色名兜底：优先用 TargetRoleName；没有就用 TargetName 名 -}}
         {{- $role_raw  = (a.TargetRoleName != null && a.TargetRoleName != "") ? a.TargetRoleName : a.TargetName -}}
+
+        {{- # ====== 成员注释 ====== -}}
+        {{- "\n\t" -}}
+        {{- "\n\t" -}}  /**
+        {{- "\n\t" -}}  * @brief 关联和单向关联作为成员变量 {{$role_raw}}
+        {{- "\n\t" -}}  */
+        {{- "\n\t" -}}
+
         {{- map_mult a.TargetName+"*" $role_raw false a.TargetMultiplicity -}} {{- }};
         {{- end -}}
     {{- end -}}

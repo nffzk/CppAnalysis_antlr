@@ -1,3 +1,12 @@
+/**
+ * @noop Automatically Generated Source File
+ * @noop Copyright (C) 2025 shareetech.com
+ * 
+ * @file Person.cpp
+ * @brief 
+ * @author ShareE
+ */
+
 #include "Person.h"
 
 // 关联关系
