@@ -32,7 +32,7 @@
 {{- # 用法： map_mult type_name var_name is_static multiplicity_tuple -}}
 {{- func map_mult(type_name, var_name, is_static, multiplicity) -}}
   {{- if multiplicity == null || multiplicity.Item1 == null || multiplicity.Item2 == null -}}
-    {{- if is_static }}static {{ end }}{{ type_name }} {{ var_name }};
+    {{- if is_static }}static {{ end }}{{ type_name }} {{ var_name }}
   {{- else -}}
     {{- lower = multiplicity.Item1 -}}
     {{- upper = multiplicity.Item2 -}}
@@ -246,7 +246,7 @@
     {{- # ============ 关联和单向关联作为成员变量 ============ -}}
     {{- if all_Associations != null && all_Associations.size > 0 -}}
     {{- for a in all_Associations -}}
-        {{- if a != null && a.TargetName != null && a.Visibility == visibility -}}
+        {{- if a != null && a.TargetName != null && a.TargetVisibility == visibility -}}
         {{- # 角色名兜底：优先用 TargetRoleName；没有就用 TargetName 名 -}}
         {{- $role_raw  = (a.TargetRoleName != null && a.TargetRoleName != "") ? a.TargetRoleName : a.TargetName -}}
 

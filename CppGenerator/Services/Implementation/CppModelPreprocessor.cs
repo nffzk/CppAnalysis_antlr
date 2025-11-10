@@ -11,6 +11,23 @@ namespace CppGenerator.Services
     /// </summary>
     public sealed class CppModelPreprocessor : ICppModelPreprocessor
     {
+        /// <summary>
+        /// UML基础数据类型到C++类型的映射字典
+        /// </summary>
+        private static readonly Dictionary<string, string> _typeMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Boolean"] = "bool",
+            ["Real"] = "double",
+            ["String"] = "std::string",
+            ["Double"] = "double",
+            ["Float"] = "float",
+            ["Char"] = "char",
+            ["Long"] = "long",
+            ["Short"] = "short",
+            ["Byte"] = "std::byte",
+            ["Integer"] = "int"
+        };
+
         public CodeClass ProcessClass(CodeClass model)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
@@ -177,7 +194,7 @@ namespace CppGenerator.Services
         }
 
         /// <summary>
-        /// 处理属性，设置默认可见性为 private
+        /// 处理属性，设置默认可见性为 private。将c#中的类型替换为cpp类型
         /// </summary>
         /// <param name="model"></param>
         private static void ProcessProperties(CodeClass model)
@@ -188,6 +205,12 @@ namespace CppGenerator.Services
             {
                 if (property.Visibility == EnumVisibility.None)
                     property.Visibility = EnumVisibility.Private;
+
+                // 替换属性类型
+                if (!string.IsNullOrWhiteSpace(property.Type))
+                {
+                    property.Type = MapTypeToCpp(property.Type.Trim());
+                }
             }
         }
 
@@ -203,6 +226,25 @@ namespace CppGenerator.Services
             {
                 if (method.Visibility == EnumVisibility.None)
                     method.Visibility = EnumVisibility.Public;
+
+                // 替换返回类型
+                if (!string.IsNullOrWhiteSpace(method.ReturnType))
+                {
+                    method.ReturnType = MapTypeToCpp(method.ReturnType.Trim());
+                }
+
+                // 替换参数类型
+                if (method.Parameters != null)
+                {
+                    foreach (var parameter in method.Parameters)
+                    {
+                        if (!string.IsNullOrWhiteSpace(parameter.Type))
+                        {
+                            parameter.Type = MapTypeToCpp(parameter.Type.Trim());
+                        }
+                    }
+                }
+
             }
         }
 
@@ -250,6 +292,26 @@ namespace CppGenerator.Services
                         method.IsPureVirtual = true;
                 }
             }
+        }
+
+        /// <summary>
+        /// 将UML基础数据类型映射为C++类型
+        /// </summary>
+        /// <param name="originalType">原始类型名称</param>
+        /// <returns>映射后的C++类型</returns>
+        private static string MapTypeToCpp(string originalType)
+        {
+            if (string.IsNullOrWhiteSpace(originalType))
+                return originalType;
+
+            // 检查是否是已知的基础数据类型
+            if (_typeMapping.ContainsKey(originalType))
+            {
+                return _typeMapping[originalType];
+            }
+
+            // 如果不是已知的基础类型，保持原样（可能是自定义类型）
+            return originalType;
         }
 
         #endregion

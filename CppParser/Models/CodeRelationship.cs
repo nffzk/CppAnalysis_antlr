@@ -89,6 +89,16 @@ namespace CppParser.Models
         /// 可见性
         /// <summary>
         public EnumVisibility Visibility { get; set; } = EnumVisibility.Public;
+
+        /// <summary>
+        /// 可见性
+        /// <summary>
+        public EnumVisibility SourceVisibility { get; set; } = EnumVisibility.Public;
+
+        /// <summary>
+        /// 可见性
+        /// <summary>
+        public EnumVisibility TargetVisibility { get; set; } = EnumVisibility.Public;
     }
 
     /// <summary>
@@ -100,6 +110,16 @@ namespace CppParser.Models
         /// 可见性
         /// <summary>
         public EnumVisibility Visibility { get; set; } = EnumVisibility.Public;
+
+        /// <summary>
+        /// 可见性
+        /// <summary>
+        public EnumVisibility SourceVisibility { get; set; } = EnumVisibility.Public;
+
+        /// <summary>
+        /// 可见性
+        /// <summary>
+        public EnumVisibility TargetVisibility { get; set; } = EnumVisibility.Public;
     }
 
     /// <summary>

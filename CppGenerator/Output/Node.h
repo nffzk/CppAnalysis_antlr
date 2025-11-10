@@ -38,12 +38,12 @@ public:
 	/**
 	* @brief 
 	*/
-	Node left;;
+	Node left;
 	
 	/**
 	* @brief 
 	*/
-	Node right;;
+	Node right;
 
 };
 

@@ -74,7 +74,7 @@ public:
 	/**
 	* @brief 
 	*/
-	std::string name1; = "Tom";
+	std::string name1 = "Tom";
 	
 	/**
 	* @brief 
@@ -136,12 +136,12 @@ private:
 	/**
 	* @brief 
 	*/
-	int age;;
+	int age;
 	
 	/**
 	* @brief 
 	*/
-	std::string name2; = "Tom1";
+	bool name2 = "Tom1";
 
 };
 

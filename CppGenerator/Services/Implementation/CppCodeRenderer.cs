@@ -55,7 +55,9 @@ namespace CppGenerator.Services
                 ||
                 (c.Properties?.Any(p => p.Visibility == EnumVisibility.Public) ?? false)
                 ||
-                (c.Associations?.Any(a => a.Visibility == EnumVisibility.Public) ?? false);
+                (c.Associations?.Any(a => a.TargetVisibility == EnumVisibility.Public) ?? false)
+                ||
+                (c.UnidirectionalAssociations?.Any(a => a.TargetVisibility == EnumVisibility.Public) ?? false);
 
             // 2) 计算是否需要 protected 区
             bool hasProtectedSection =
@@ -63,7 +65,9 @@ namespace CppGenerator.Services
                 ||
                 (c.Properties?.Any(p => p.Visibility == EnumVisibility.Protected) ?? false)
                 ||
-                (c.Associations?.Any(a => a.Visibility == EnumVisibility.Protected) ?? false);
+                (c.Associations?.Any(a => a.TargetVisibility == EnumVisibility.Protected) ?? false)
+                ||
+                (c.UnidirectionalAssociations?.Any(a => a.TargetVisibility == EnumVisibility.Protected) ?? false);
 
             // 3) 计算是否需要 private 区
             bool hasPrivateSection =
@@ -71,7 +75,9 @@ namespace CppGenerator.Services
                 ||
                 (c.Properties?.Any(p => p.Visibility == EnumVisibility.Private) ?? false)
                 ||
-                (c.Associations?.Any(a => a.Visibility == EnumVisibility.Private) ?? false);
+                (c.Associations?.Any(a => a.TargetVisibility == EnumVisibility.Private) ?? false)
+                ||
+                (c.UnidirectionalAssociations?.Any(a => a.TargetVisibility == EnumVisibility.Private) ?? false);
 
 
             // 3) 推入模板上下文
