@@ -1,168 +1,130 @@
-﻿// Program.cs
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using CppParser.Services;
 using CppParser.Models;
+using CppParser.Services.Implementation;
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        string filePath = "D:\\work\\learn\\tools\\vs\\CppAnalysis_antlr\\CppParser\\Demo\\MyClass.h";
+        // 测试文件路径
+        string testHeaderPath = @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppParser\Demo\MyClass2.h";
 
-        if (!File.Exists(filePath))
+        if (!File.Exists(testHeaderPath))
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"[Warn] File not found: {filePath}");
-            Console.ResetColor();
+            Console.WriteLine($"Test file not found: {testHeaderPath}");
+            Console.WriteLine("Please create a test C++ header file first.");
             return;
         }
 
         try
         {
-            var source = File.ReadAllText(filePath, Encoding.UTF8);
+            var parser = new CppHeaderParser();
+            var headerFile = parser.ParseHeaderFile(testHeaderPath);
 
-            var parser = new HeaderParser();
-            var model = parser.BuildHeaderModel(Path.GetFileName(filePath), source);
-
-            PrintHeader(model);
+            DisplayHeaderFileInfo(headerFile);
         }
         catch (Exception ex)
         {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("[Error] Failed to parse header:");
-            Console.WriteLine(ex.ToString());
-            Console.ResetColor();
+            Console.WriteLine($"Error parsing header file: {ex.Message}");
+            Console.WriteLine($"Stack trace: {ex.StackTrace}");
         }
     }
 
-    static void PrintHeader(CodeHeaderFile header)
+    static void DisplayHeaderFileInfo(CodeHeaderFile headerFile)
     {
-        Console.ForegroundColor = ConsoleColor.Cyan;
-        Console.WriteLine($"=== Header: {header.FileName} ===");
-        Console.ResetColor();
+        Console.WriteLine($"=== C++ Header File Analysis ===");
+        Console.WriteLine($"File: {headerFile.FileName}");
+        Console.WriteLine();
 
-        // 顶层枚举
-        if (header.Enums?.Any() == true)
+        // 显示枚举
+        if (headerFile.Enums.Any())
         {
-            Console.WriteLine("Enums:");
-            foreach (var e in header.Enums)
+            Console.WriteLine("ENUMS:");
+            foreach (var enumItem in headerFile.Enums)
             {
-                Console.WriteLine($"  - {e.Name}  (Scoped={e.IsScoped}, UnderlyingType={e.UnderlyingType ?? "N/A"})");
-                if (e.Values?.Any() == true)
+                Console.WriteLine($"  {enumItem.Name} {(enumItem.IsScoped ? "(scoped)" : "")}");
+                if (!string.IsNullOrEmpty(enumItem.UnderlyingType))
+                    Console.WriteLine($"    Underlying Type: {enumItem.UnderlyingType}");
+                if (enumItem.Values.Any())
+                    Console.WriteLine($"    Values: {string.Join(", ", enumItem.Values)}");
+                Console.WriteLine();
+            }
+        }
+
+        // 显示类
+        if (headerFile.Classes.Any())
+        {
+            Console.WriteLine("CLASSES/STRUCTS:");
+            foreach (var classItem in headerFile.Classes)
+            {
+                Console.WriteLine($"  {classItem.Stereotype} {classItem.Name}");
+
+                // 显示继承关系
+                if (classItem.Generalizations.Any())
                 {
-                    Console.WriteLine($"      Values: {string.Join(", ", e.Values)}");
+                    Console.WriteLine("    Inherits from:");
+                    foreach (var baseClass in classItem.Generalizations)
+                    {
+                        Console.WriteLine($"      {baseClass.TargetName}");
+                    }
                 }
-            }
-        }
 
-        // 顶层类/结构/联合
-        if (header.Classes?.Any() == true)
-        {
-            Console.WriteLine("Types:");
-            foreach (var c in header.Classes)
-            {
-                PrintClass(c, indent: 0);
-            }
-        }
-    }
-
-    static void PrintClass(CodeClass c, int indent)
-    {
-        var pad = new string(' ', indent * 2);
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"{pad}- {c.Stereotype} {c.Name}");
-        Console.ResetColor();
-
-        //if (c.BaseClasses?.Any() == true)
-        //{
-        //    Console.WriteLine($"{pad}  Bases: {string.Join(", ", c.BaseClasses)}");
-        //}
-
-        // 类内枚举
-        if (c.Enums?.Any() == true)
-        {
-            Console.WriteLine($"{pad}  Enums:");
-            foreach (var e in c.Enums)
-            {
-                Console.WriteLine($"{pad}    - {e.Name}  (Scoped={e.IsScoped}, UnderlyingType={e.UnderlyingType ?? "N/A"})");
-                if (e.Values?.Any() == true)
+                // 显示属性
+                if (classItem.Properties.Any())
                 {
-                    Console.WriteLine($"{pad}        Values: {string.Join(", ", e.Values)}");
+                    Console.WriteLine("    Properties:");
+                    foreach (var property in classItem.Properties)
+                    {
+                        var modifiers = new System.Collections.Generic.List<string>();
+                        if (property.IsStatic) modifiers.Add("static");
+
+                        var modText = modifiers.Any() ? $" [{string.Join(" ", modifiers)}]" : "";
+                        Console.WriteLine($"      {property.Visibility} {property.Type} {property.Name}{modText}");
+                        if (!string.IsNullOrEmpty(property.DefaultValue))
+                            Console.WriteLine($"        Default: {property.DefaultValue}");
+                    }
                 }
-            }
-        }
 
-        // 成员变量
-        if (c.Properties?.Any() == true)
-        {
-            Console.WriteLine($"{pad}  Properties:");
-            foreach (var p in c.Properties)
-            {
-                var flags = string.Join(", ", new[]
+                // 显示方法
+                if (classItem.Methods.Any())
                 {
-                    p.IsStatic ? "static" : null,
-                    //p.IsConst ? "const" : null,
-                    //p.IsVolatile ? "volatile" : null,
-                    //p.IsPointer ? "*" : null,
-                    //p.IsReference ? "&" : null,
-                    //p.IsArray ? "[]" : null,
-                    //p.IsSigned ? "signed" : null,
-                    //p.IsUnsigned ? "unsigned" : null,
-                    //p.IsShort ? "short" : null,
-                    //p.IsLong ? "long" : null,
-                    //p.IsMutable ? "mutable" : null
-                }.Where(s => s != null));
+                    Console.WriteLine("    Methods:");
+                    foreach (var method in classItem.Methods)
+                    {
+                        var modifiers = new System.Collections.Generic.List<string>();
+                        if (method.IsStatic) modifiers.Add("static");
+                        if (method.IsVirtual) modifiers.Add("virtual");
+                        if (method.IsPureVirtual) modifiers.Add("= 0");
 
-                //var typeText = !string.IsNullOrWhiteSpace(p.FullType) ? p.Type : p.Type ?? "(unknown)";
-                //Console.WriteLine($"{pad}    - [{p.Visibility}] {typeText} {p.Name}{(p.IsArray ? $"[{p.ArraySize}]" : "")}{(string.IsNullOrEmpty(p.DefaultValue) ? "" : $"  {p.DefaultValue}")}{(string.IsNullOrEmpty(flags) ? "" : $"  {{{flags}}}")}");
+                        var modText = modifiers.Any() ? $" [{string.Join(" ", modifiers)}]" : "";
+                        var parameters = method.Parameters.Any()
+                            ? string.Join(", ", method.Parameters.Select(p => $"{p.Type} {p.Name}"))
+                            : "";
+
+                        Console.WriteLine($"      {method.Visibility} {method.ReturnType} {method.Name}({parameters}){modText}");
+                    }
+                }
+
+                // 显示嵌套枚举
+                if (classItem.Enums.Any())
+                {
+                    Console.WriteLine("    Nested Enums:");
+                    foreach (var enumItem in classItem.Enums)
+                    {
+                        Console.WriteLine($"      {enumItem.Name}");
+                    }
+                }
+
+                Console.WriteLine();
             }
         }
 
-        // 成员函数
-        if (c.Methods?.Any() == true)
+        if (!headerFile.Enums.Any() && !headerFile.Classes.Any())
         {
-            Console.WriteLine($"{pad}  Methods:");
-            foreach (var m in c.Methods)
-            {
-                var returnType = new StringBuilder();
-                //if (m.IsReturnConst) returnType.Append("const ");
-                //returnType.Append(string.IsNullOrWhiteSpace(m.ReturnType) ? "/*ctor/dtor/operator*/" : m.ReturnType);
-                //if (m.ReturnTypeIsPointer) returnType.Append(" *");
-                //if (m.ReturnTypeIsReference) returnType.Append(" &");
-
-                //var paramList = (m.Parameters == null || m.Parameters.Count == 0)
-                //    ? ""
-                //    : string.Join(", ", m.Parameters.Select(par =>
-                //    {
-                //        //var pt = !string.IsNullOrWhiteSpace(par.FullType) ? par.Type : par.Type ?? "(unknown)";
-                //        //var rref = par.IsRValueReference ? "&&" : "";
-                //        //var arr = par.IsArray ? $"[{par.ArraySize}]" : "";
-                //        //return $"{pt}{(par.IsPointer ? " *" : "")}{(par.IsReference ? " &" : "")}{rref} {par.Name}{arr}";
-                //    }));
-
-                //var flags = string.Join(", ", new[]
-                //{
-                //    m.IsInline ? "inline" : null,
-                //    m.IsStatic ? "static" : null,
-                //    m.IsExplicit ? "explicit" : null,
-                //    m.IsFriend ? "friend" : null,
-                //    m.IsConstexpr ? "constexpr" : null,
-                //    m.IsVirtual ? "virtual" : null,
-                //    m.IsPureVirtual ? "pure-virtual" : null,
-                //    m.IsConst ? "const" : null,
-                //    m.IsDefaultImplementation ? "default" : null,
-                //    m.IsDeleted ? "delete" : null,
-                //    m.IsOverride ? "override" : null,
-                //    m.IsFinal ? "final" : null
-                //}.Where(s => s != null));
-
-               // Console.WriteLine($"{pad}    - [{m.Visibility}] {returnType} {m.Name}({paramList}){(string.IsNullOrEmpty(flags) ? "" : $"  {{{flags}}}")}");
-            }
+            Console.WriteLine("No classes or enums found in the header file.");
         }
-
-
     }
 }

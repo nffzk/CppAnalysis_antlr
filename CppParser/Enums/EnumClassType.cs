@@ -37,5 +37,10 @@ namespace CppParser.Enums
         /// 枚举，只在处理关系的时候用到
         /// </summary>
         Enum,
+
+        /// <summary>
+        /// 联合体，只在读取 C++ 代码时用到
+        /// </summary>
+        Union,
     }
 }
