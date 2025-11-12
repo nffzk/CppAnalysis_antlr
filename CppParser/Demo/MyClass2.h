@@ -9,7 +9,7 @@ private:
 	//static double m_double;
 	//mutable std::string m_name; // 成员变量
 
-	int astatic = 10;
+	int astatic[10];
 	
 	//int a =    10;
 	//static char c;
