@@ -8,6 +8,9 @@ using CppParser.Models;
 
 namespace CppParser.Services.Implementation
 {
+    /// <summary>
+    /// C++头文件访问者，用于构建CodeHeaderFile模型
+    /// </summary>
     public class CppHeaderVisitor : CPP14ParserBaseVisitor<object>
     {
         private readonly string _fileName;
@@ -628,7 +631,7 @@ namespace CppParser.Services.Implementation
         }
 
         /// <summary>
-        /// 从声明器中提取标识符名称
+        /// 从声明器中提取标识符名称，用于提取属性和方法参数的名称
         /// </summary>
         /// <param name="declarator"></param>
         /// <returns></returns>

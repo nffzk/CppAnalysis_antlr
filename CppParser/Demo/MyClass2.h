@@ -10,6 +10,12 @@ private:
 	//mutable std::string m_name; // 成员变量
 
 	int astatic[10];
+
+	int temp[5][6];
+
+	vector<int> vec;
+
+	std::vector<string> strVec;
 	
 	//int a =    10;
 	//static char c;

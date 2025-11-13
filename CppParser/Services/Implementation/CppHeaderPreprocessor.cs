@@ -96,8 +96,80 @@ namespace CppParser.Services.Implementation
         private void PreprocessProperty(CodeProperty property)
         {
             if (property == null) return;
+
+            // 检查并处理一维数组
+            if (IsOneDimensionalArray(property.Type, out string elementType, out string arraySize))
+            {
+                // 对于一维数组，提取元素类型并设置多重性
+                property.Type = elementType;
+                property.CustomType = string.Empty;
+                property.Multiplicity = new Tuple<string, string>(arraySize, arraySize); // 下限、上限为数组大小
+            }
+            // 如果类型为 vector<T> 或者 std:vector<T> 将多重性设置为 *..*
+            else if (IsVectorType(property.Type))
+            {
+                // 对于vector类型，提取元素类型并设置多重性为 "*..*"
+                property.Multiplicity = new Tuple<string, string>("0", "*"); // 下限0、上限为*
+            }
+
+            // 获取映射后的类型信息
             (property.Type, property.CustomType) = GetMappedTypeInfo(property.Type);
         }
+
+        /// <summary>
+        /// 检查类型是否为vector类型，并提取元素类型
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="elementType"></param>
+        /// <returns></returns>
+        private bool IsVectorType(string type)
+        {
+
+            if (string.IsNullOrWhiteSpace(type)) return false;
+
+            // 使用正则表达式匹配vector类型
+            var match = System.Text.RegularExpressions.Regex.Match(type.Trim(),
+                @"^(std::)?vector\s*<\s*([^>]+)\s*>$");
+
+            if (match.Success)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// 检查类型是否为一维数组，并提取元素类型和数组大小
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="elementType"></param>
+        /// <param name="arraySize"></param>
+        /// <returns></returns>
+        private bool IsOneDimensionalArray(string type, out string elementType, out string arraySize)
+        {
+            elementType = string.Empty;
+            arraySize = string.Empty;
+
+            if (string.IsNullOrWhiteSpace(type)) return false;
+
+            // 使用正则表达式匹配一维数组模式：类型[大小]
+            var match = System.Text.RegularExpressions.Regex.Match(type.Trim(), @"^([^\[\]]+)\[(\d+)\]$");
+            if (match.Success)
+            {
+                elementType = match.Groups[1].Value.Trim();
+                arraySize = match.Groups[2].Value.Trim();
+
+                // 确保不是多维数组（检查是否包含多个方括号）
+                int openBracketCount = type.Count(c => c == '[');
+                int closeBracketCount = type.Count(c => c == ']');
+
+                return openBracketCount == 1 && closeBracketCount == 1;
+            }
+
+            return false;
+        }
+
 
         /// <summary>
         /// 获取映射后的类型信息
@@ -111,11 +183,11 @@ namespace CppParser.Services.Implementation
                 ? (string.Empty, originalType)    // 自定义类型
                 : (mappedType, string.Empty);     // 基础类型
         }
+
         /// <summary>
         /// 预处理方法模型
         /// </summary>
         /// <param name="method"></param>
-
         private void PreprocessMethod(CodeMethod method)
         {
             if (method == null) return;

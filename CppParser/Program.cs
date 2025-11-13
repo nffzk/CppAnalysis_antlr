@@ -10,7 +10,7 @@ class Program
     static void Main(string[] args)
     {
         // 测试文件路径
-        string testHeaderPath = @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppParser\Demo\MyClass.h";
+        string testHeaderPath = @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppParser\Demo\MyClass2.h";
 
         if (!File.Exists(testHeaderPath))
         {
@@ -108,7 +108,7 @@ class Program
 
 
                         var returnType = method.ReturnType == string.Empty ? method.CustomReturnType : method.ReturnType;
-                        Console.WriteLine($"      {method.Visibility} {method.ReturnType} {method.Name}({parameters}){modText}");
+                        Console.WriteLine($"      {method.Visibility} {returnType} {method.Name}({parameters}){modText}");
                     }
                 }
 

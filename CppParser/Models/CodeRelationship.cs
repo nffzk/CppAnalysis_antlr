@@ -25,7 +25,6 @@ namespace CppParser.Models
         /// </summary>
         public string TargetName { get; set; }
 
-        
         /// <summary>
         /// 目标类型
         /// </summary>
