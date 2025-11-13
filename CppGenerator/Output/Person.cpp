@@ -13,6 +13,8 @@
 #include "Company2.h"
 #include "Company3.h"
 #include "Company4.h"
+// 单向关联关系
+#include "Company5.h"
 
 Person::Person()
 {

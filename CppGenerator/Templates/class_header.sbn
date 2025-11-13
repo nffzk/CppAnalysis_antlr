@@ -52,6 +52,14 @@
   {{- end -}}
 {{- end -}}
 
+{{- # === 返回sourceName和targetName中不等于c.Name的字符串 === -}}
+{{ func get_non_equal_name(SourceName, TargetName, className) 
+    if SourceName != null && SourceName != className 
+      ret SourceName 
+    else if TargetName != null && TargetName != className 
+      ret TargetName 
+    end 
+end }}
 
 {{- "\n" -}}
 {{- # === 头文件 === -}}
@@ -101,21 +109,25 @@
 
 {{- # === 关联关系 === -}}
 {{- if c.Associations != null && c.Associations.size > 0 }}
-{{- for a in c.Associations }}
+// 关联关系
+{{- for b in c.Associations }}
 {{- if c.Associations.TargetStereotype !=$TYPE_ENUM }}
-{{- # 定义类型变量 -}}
-{{- target_type = c.Associations.TargetStereotype == $TYPE_STRUCT ? "struct" : "class" }}
-{{ target_type }} {{ a.TargetName }};
+{{- Association_type = c.Associations.TargetStereotype == $TYPE_STRUCT ? "struct" : "class" }}
+{{- Association_class  = get_non_equal_name b.SourceName b.TargetName c.Name -}}
+{{- if Association_class != "" }}
+{{ Association_type }} {{ Association_class }};
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
 
-{{- if c.UniDirectionalAssociations != null && c.UniDirectionalAssociations.size > 0 }}
-{{- for a in c.UniDirectionalAssociations }}
-{{- if c.UniDirectionalAssociations.TargetStereotype !=$TYPE_ENUM }}
-{{- # 定义类型变量 -}}
-{{- target_type = c.UniDirectionalAssociations.TargetStereotype == $TYPE_STRUCT ? "struct" : "class" }}
-{{ target_type }} {{ a.TargetName }};
+{{- # === 单向关联关系 === -}}
+{{- if c.UnidirectionalAssociations != null && c.UnidirectionalAssociations.size > 0 }}
+// 单向关联关系
+{{- for b in c.UnidirectionalAssociations }}
+{{- if c.UnidirectionalAssociations.TargetStereotype != $TYPE_ENUM }}
+{{- Association_type = c.UnidirectionalAssociations.TargetStereotype == $TYPE_STRUCT ? "struct" : "class" }}
+{{ Association_type }} {{ b.TargetName }};
 {{- end }}
 {{- end }}
 {{- end }}
@@ -229,23 +241,49 @@
         {{- "\n\t" -}}  */
         {{- "\n\t" -}}
 
-        {{- map_mult a.TargetName $role_raw false a.TargetMultiplicity -}} {{- }};
+        {{- map_mult a.TargetName $role_raw false a.TargetMultiplicity -}};
         {{- end -}}
     {{- end -}}
     {{- end -}}
 
-    {{- # 合并关联关系和单向关联关系 -}}
-    {{- all_Associations = [] }}
-    {{- if c.Associations != null }}
-    {{-   all_Associations = all_Associations | array.add_range c.Associations }}
-    {{- end }}
-    {{- if c.UnidirectionalAssociations != null }}
-    {{-   all_Associations = all_Associations | array.add_range c.UnidirectionalAssociations }}
+    {{- # ============ 关联关系作为成员变量 ============ -}}
+    {{- if c.Associations != null && c.Associations.size > 0 -}}
+    {{- for a in c.Associations -}}
+        {{- if a != null && a.TargetName != null && a.TargetVisibility == visibility -}}
+        {{- if a.SourceName == c.Name -}}
+        {{- # 角色名兜底：优先用 TargetRoleName；没有就用 TargetName 名 -}}
+        {{- $role_raw  = (a.TargetRoleName != null && a.TargetRoleName != "") ? a.TargetRoleName : a.TargetName -}}
+
+        {{- # ====== 成员变量注释 ====== -}}
+        {{- "\n\t" -}}
+        {{- "\n\t" -}}  /**
+        {{- "\n\t" -}}  * @brief 关联关系成员变量 {{$role_raw}}
+        {{- "\n\t" -}}  */
+        {{- "\n\t" -}}
+
+        {{- map_mult a.TargetName+"*" $role_raw false a.SourceMultiplicity -}};
+        
+        {{- else if a.TargetName == c.Name -}}
+        {{- # 角色名兜底：优先用 SourceRoleName；没有就用 SourceName 名 -}}
+        {{- $role_raw  = (a.SourceRoleName != null && a.SourceRoleName != "") ? a.SourceRoleName : a.SourceName -}}
+
+        {{- # ====== 成员变量注释 ====== -}}
+        {{- "\n\t" -}}
+        {{- "\n\t" -}}  /**
+        {{- "\n\t" -}}  * @brief 关联关系成员变量 {{$role_raw}}
+        {{- "\n\t" -}}  */
+        {{- "\n\t" -}}
+
+        {{- map_mult a.SourceName+"*" $role_raw false a.TargetMultiplicity -}};
+
+        {{- end -}}
+        {{- end -}}
+    {{- end -}}
     {{- end -}}
 
-    {{- # ============ 关联和单向关联作为成员变量 ============ -}}
-    {{- if all_Associations != null && all_Associations.size > 0 -}}
-    {{- for a in all_Associations -}}
+    {{- # ============ 单向关联关系作为成员变量 ============ -}}
+    {{- if c.UnidirectionalAssociations != null && c.UnidirectionalAssociations.size > 0 -}}
+    {{- for a in c.UnidirectionalAssociations -}}
         {{- if a != null && a.TargetName != null && a.TargetVisibility == visibility -}}
         {{- # 角色名兜底：优先用 TargetRoleName；没有就用 TargetName 名 -}}
         {{- $role_raw  = (a.TargetRoleName != null && a.TargetRoleName != "") ? a.TargetRoleName : a.TargetName -}}
@@ -253,7 +291,7 @@
         {{- # ====== 成员变量注释 ====== -}}
         {{- "\n\t" -}}
         {{- "\n\t" -}}  /**
-        {{- "\n\t" -}}  * @brief 关联和单向关联作为成员变量 {{$role_raw}}
+        {{- "\n\t" -}}  * @brief 单向关联关系成员变量 {{$role_raw}}
         {{- "\n\t" -}}  */
         {{- "\n\t" -}}
 

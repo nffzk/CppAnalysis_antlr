@@ -38,6 +38,7 @@ namespace CppGenerator.Services
             // 2. 处理属性、方法和关系
             ProcessProperties(model);
             ProcessMethods(model);
+            ProcessRelationship(model);
 
             // 3. 排序
             SortMethods(model);
@@ -48,6 +49,52 @@ namespace CppGenerator.Services
 
             return model;
         }
+
+        /// <summary>
+        /// 处理类的关系
+        /// </summary>
+        /// <param name="model"></param>
+        private static void ProcessRelationship(CodeClass model)
+        {
+            // 1. 处理继承、实现关系。如果TargetName和model.Name相同，移除该关系
+            if (model.Generalizations != null)
+            {
+                model.Generalizations = model.Generalizations
+                    .Where(b => !string.Equals(b.TargetName, model.Name, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+            if (model.Realizations != null)
+            {
+                model.Realizations = model.Realizations
+                    .Where(b => !string.Equals(b.TargetName, model.Name, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            // 2. 处理单向关联关系。如果TargetName和model.Name相同，移除该关系
+            if (model.UnidirectionalAssociations != null)
+            {
+                model.UnidirectionalAssociations = model.UnidirectionalAssociations
+                    .Where(a => !string.Equals(a.TargetName, model.Name, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            // 3. 处理依赖关系。如果TargetName和model.Name相同，移除该关系
+            if (model.Dependencies != null)
+            {
+                model.Dependencies = model.Dependencies
+                    .Where(d => !string.Equals(d.TargetName, model.Name, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            // 4. 处理聚合、组合关系。如果TargetName和model.Name相同，移除该关系
+            if (model.Associations != null)
+            {
+                model.Associations = model.Associations
+                    .Where(a => !string.Equals(a.TargetName, model.Name, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+        }
+
 
         public CodeEnum ProcessEnum(CodeEnum model)
         {

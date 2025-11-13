@@ -15,23 +15,25 @@
 
 // 泛化关系
 #include "LivingBeing1"
-#include "LivingBeing2"
 // 实现关系
 #include "Realization1"
 #include "Realization1"
 // 聚合关系
 #include "Address"
 
+// 关联关系
 class Company2;
 class Company3;
 class Company4;
+// 单向关联关系
+class Company5;
 
 /**
  * @struct Person
  * @brief 
  * @details 
  */
-struct Person : public LivingBeing1, public LivingBeing2, public Realization1, public Realization1
+struct Person : public LivingBeing1, public Realization1, public Realization1
 {
 
 public:
@@ -107,29 +109,19 @@ public:
 	std::vector<Address> employer1;
 	
 	/**
-	* @brief 关联和单向关联作为成员变量 employer1
+	* @brief 关联关系成员变量 employer1
 	*/
-	Company2* employer1[0];
+	Company2* employer1;
 	
 	/**
-	* @brief 关联和单向关联作为成员变量 employer2
+	* @brief 关联关系成员变量 employer2
 	*/
-	std::vector<Company3*> employer2;
+	Company3* employer2;
 	
 	/**
-	* @brief 关联和单向关联作为成员变量 employer3
-	*/
-	Company4* employer3[3];
-	
-	/**
-	* @brief 关联和单向关联作为成员变量 employer4
+	* @brief 单向关联关系成员变量 employer4
 	*/
 	std::vector<Company5*> employer4;
-	
-	/**
-	* @brief 关联和单向关联作为成员变量 employer5
-	*/
-	Company6* employer5[4];
 
 private:
 	

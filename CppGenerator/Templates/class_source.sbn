@@ -34,20 +34,30 @@
   {{- end -}}
 {{- end -}}
 
-
+{{- # === 返回sourceName和targetName中不等于c.Name的字符串 === -}}
+{{ func get_non_equal_name(SourceName, TargetName, className) 
+    if SourceName != null && SourceName != className 
+      ret SourceName 
+    else if TargetName != null && TargetName != className 
+      ret TargetName 
+    end 
+end }}
 
 {{- "\n" -}}
 {{- # === 关联关系 === -}}
 {{- if c.Associations != null && c.Associations.size > 0 }}
 // 关联关系
 {{- for a in c.Associations }}
-#include "{{ a.TargetName }}.h"
+{{- Association_class  = get_non_equal_name a.SourceName a.TargetName c.Name -}}
+{{- if Association_class != "" }}
+#include "{{ Association_class }}.h"
+{{- end }}
 {{- end }}
 {{- end }}
 
-{{- if c.UniDirectionalAssociations != null && c.UniDirectionalAssociations.size > 0 }}
+{{- if c.UnidirectionalAssociations != null && c.UnidirectionalAssociations.size > 0 }}
 // 单向关联关系
-{{- for a in c.UniDirectionalAssociations }}
+{{- for a in c.UnidirectionalAssociations }}
 #include "{{ a.TargetName }}.h"
 {{- end }}
 {{- end }}
