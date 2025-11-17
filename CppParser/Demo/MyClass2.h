@@ -9,13 +9,19 @@ private:
 	//static double m_double;
 	//mutable std::string m_name; // 成员变量
 
-	int astatic[10];
+	//int astatic[10];
+	//void (*func)();           // 函数指针
+	//int temp[5][6];
+	//void setValue(int* val);
+	//vector<int*> vec1;
+	//vector<Class1*> vec2;
+	std::vector<Class1*> vec3;
+	vector<vector<Class*>> vec4;
+	const int x1;
+	static double x2;
+	volatile Class1 x3;
 
-	int temp[5][6];
-
-	vector<int> vec;
-
-	std::vector<string> strVec;
+	//std::vector<string> strVec;
 	
 	//int a =    10;
 	//static char c;

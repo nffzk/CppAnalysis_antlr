@@ -105,7 +105,7 @@ namespace CppParser.Services.Implementation
                 property.CustomType = string.Empty;
                 property.Multiplicity = new Tuple<string, string>(arraySize, arraySize); // 下限、上限为数组大小
             }
-            // 如果类型为 vector<T> 或者 std:vector<T> 将多重性设置为 *..*
+            // 如果类型为 vector<T> 或者 std:vector<T> 也算是一维度数组，将多重性设置为 *..*
             else if (IsVectorType(property.Type))
             {
                 // 对于vector类型，提取元素类型并设置多重性为 "*..*"
@@ -114,6 +114,12 @@ namespace CppParser.Services.Implementation
 
             // 获取映射后的类型信息
             (property.Type, property.CustomType) = GetMappedTypeInfo(property.Type);
+
+            // 预处理UnderlyingType
+            if (property.Type != string.Empty)
+            {
+                property.UnderlyingType = property.Type;
+            }
         }
 
         /// <summary>
@@ -193,6 +199,12 @@ namespace CppParser.Services.Implementation
             if (method == null) return;
             (method.ReturnType, method.CustomReturnType) = GetMappedTypeInfo(method.ReturnType);
 
+            // 预处理UnderlyingReturnType
+            if (method.ReturnType != string.Empty)
+            {
+                method.UnderlyingReturnType = method.ReturnType;
+            }
+
             // 预处理参数
             if (method.Parameters != null)
             {
@@ -211,6 +223,12 @@ namespace CppParser.Services.Implementation
         {
             if (parameter == null) return;
             (parameter.Type, parameter.CustomType) = GetMappedTypeInfo(parameter.Type);
+
+            // 预处理UnderlyingType
+            if (parameter.Type != string.Empty)
+            {
+                parameter.UnderlyingType = parameter.Type;
+            }
         }
 
         /// <summary>

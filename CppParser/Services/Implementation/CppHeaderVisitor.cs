@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Antlr4.Runtime.Misc;
 using Antlr4.Runtime.Tree;
 using CppParser.Enums;
 using CppParser.Grammars.Generated;
 using CppParser.Models;
+using Microsoft.VisualBasic;
 
 namespace CppParser.Services.Implementation
 {
@@ -195,12 +197,15 @@ namespace CppParser.Services.Implementation
 
                 // 构建方法信息
                 var methodInfo = ExtractMethodInfo(context.declarator(), baseReturnType);
+                bool isPointer = methodInfo.ReturnType.Contains("*") || methodInfo.ReturnType.Contains("&") || methodInfo.ReturnType.Contains("&&");
 
                 var method = new CodeMethod
                 {
                     Visibility = currentVisibility,
                     Name = methodInfo.Name,
                     ReturnType = methodInfo.ReturnType,
+                    IsReturnPointer = isPointer,
+                    UnderlyingReturnType = ,
                     IsStatic = context.declSpecifierSeq()?.GetText().Contains("static") == true,
                     IsVirtual = context.declSpecifierSeq()?.GetText().Contains("virtual") == true,
                     Parameters = methodInfo.Parameters,
@@ -320,13 +325,16 @@ namespace CppParser.Services.Implementation
                     // 获取完整的类型信息（包括指针、数组等修饰符）
                     string fullType = BuildFullType(baseType, declarator.declarator());
                     string propertyName = ExtractDeclaratorName(declarator.declarator());
+                    bool isPointer = fullType.Contains("*") || fullType.Contains("&") || fullType.Contains("&&");
 
                     var property = new CodeProperty
                     {
                         Visibility = visibility,
                         Name = propertyName,
                         // 先记录完整类型，后面会做预处理
-                        Type = fullType, 
+                        Type = fullType,
+                        IsPointer = isPointer,
+                        UnderlyingType = ,
                         IsStatic = context.declSpecifierSeq()?.GetText().Contains("static") == true,
                         DefaultValue = ExtractDefaultValue(declarator)
                     };
@@ -477,12 +485,15 @@ namespace CppParser.Services.Implementation
 
                 // 构建完整的方法信息
                 var methodInfo = ExtractMethodInfo(declarator.declarator(), baseReturnType);
+                bool isPointer = methodInfo.ReturnType.Contains("*") || methodInfo.ReturnType.Contains("&") || methodInfo.ReturnType.Contains("&&");
 
                 var method = new CodeMethod
                 {
                     Visibility = visibility,
                     Name = methodInfo.Name,
                     ReturnType = methodInfo.ReturnType,
+                    IsReturnPointer = isPointer,
+                    UnderlyingReturnType = ,
                     IsStatic = context.declSpecifierSeq()?.GetText().Contains("static") == true,
                     IsVirtual = context.declSpecifierSeq()?.GetText().Contains("virtual") == true,
                     IsPureVirtual = IsPureVirtualMethod(context),
@@ -607,6 +618,9 @@ namespace CppParser.Services.Implementation
             string baseType = paramDeclaration.declSpecifierSeq() != null ?
                 ExtractPropertyType(paramDeclaration.declSpecifierSeq()) : string.Empty;
             string fullType = BuildFullType(baseType, paramDeclaration.declarator());
+            bool isPointer = fullType.Contains("*") || fullType.Contains("&") || fullType.Contains("&&");
+            parameter.IsPointer = isPointer;
+            parameter.UnderlyingType = ;
 
             // 提取参数名和完整类型
             if (paramDeclaration.declarator() != null)
@@ -618,7 +632,7 @@ namespace CppParser.Services.Implementation
             {
                 // 没有声明器的情况（如匿名参数）
                 parameter.Name = string.Empty;
-                parameter.Type = baseType;
+                parameter.Type = fullType;
             }
 
             // 处理默认值
