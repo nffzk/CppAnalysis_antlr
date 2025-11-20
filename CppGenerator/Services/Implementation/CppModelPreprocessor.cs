@@ -56,48 +56,134 @@ namespace CppGenerator.Services
         /// <param name="model"></param>
         private static void ProcessRelationship(CodeClass model)
         {
-            // 1. 处理继承、实现关系。如果TargetName和model.Name相同，移除该关系
+            // 1. 处理继承、实现关系。
             if (model.Generalizations != null)
             {
+                // 如果TargetName和model.Name相同，移除该关系
                 model.Generalizations = model.Generalizations
                     .Where(b => !string.Equals(b.TargetName, model.Name, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
             if (model.Realizations != null)
             {
+                // 如果TargetName和model.Name相同，移除该关系
                 model.Realizations = model.Realizations
                     .Where(b => !string.Equals(b.TargetName, model.Name, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
 
-            // 2. 处理单向关联关系。如果TargetName和model.Name相同，移除该关系
+            // 2. 处理单向关联关系。
             if (model.UnidirectionalAssociations != null)
             {
-                model.UnidirectionalAssociations = model.UnidirectionalAssociations
-                    .Where(a => !string.Equals(a.TargetName, model.Name, StringComparison.OrdinalIgnoreCase))
+                // 获取所有需要移除的关系
+                var UnidirectionalAssociationsToRemove = model.UnidirectionalAssociations
+                    .Where(a =>
+                        // 条件1：TargetName和model.Name相同
+                        string.Equals(a.TargetName, model.Name, StringComparison.OrdinalIgnoreCase) ||
+                        // 条件2：TargetName等于属性中的Type/CustomType且TargetRoleName等于属性中的Name
+                        (model.Properties != null && model.Properties.Any(p =>
+                            (string.Equals(p.Type, a.TargetName, StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(p.CustomType, a.TargetName, StringComparison.OrdinalIgnoreCase)) &&
+                            string.Equals(p.Name, a.TargetRoleName, StringComparison.OrdinalIgnoreCase)))
+                    )
                     .ToList();
+
+                // 移除匹配的关系
+                foreach (var UnidirectionalAssociationToRemove in UnidirectionalAssociationsToRemove)
+                {
+                    model.UnidirectionalAssociations.Remove(UnidirectionalAssociationToRemove);
+                }
             }
 
-            // 3. 处理依赖关系。如果TargetName和model.Name相同，移除该关系
+            // 3. 处理依赖关系。
             if (model.Dependencies != null)
             {
+                // 如果TargetName和model.Name相同，移除该关系
                 model.Dependencies = model.Dependencies
                     .Where(d => !string.Equals(d.TargetName, model.Name, StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
 
-            // 4. 处理聚合、组合关系。如果TargetName和model.Name相同，移除该关系
+            // 4. 处理聚合、组合关系。
             if (model.Compositions != null)
             {
-                model.Compositions = model.Compositions
-                    .Where(a => !string.Equals(a.TargetName, model.Name, StringComparison.OrdinalIgnoreCase))
+                // 如果TargetName和model.Name相同，移除该关系
+                var compositionsToRemove = model.Compositions
+                    .Where(a =>
+                        // 条件1：TargetName和model.Name相同
+                        string.Equals(a.TargetName, model.Name, StringComparison.OrdinalIgnoreCase) ||
+                        // 条件2：TargetName等于属性中的Type/CustomType且TargetRoleName等于属性中的Name
+                        (model.Properties != null && model.Properties.Any(p =>
+                            (string.Equals(p.Type, a.TargetName, StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(p.CustomType, a.TargetName, StringComparison.OrdinalIgnoreCase)) &&
+                            string.Equals(p.Name, a.TargetRoleName, StringComparison.OrdinalIgnoreCase)))
+                    )
                     .ToList();
+                // 移除匹配的关系
+                foreach (var compositionToRemove in compositionsToRemove)
+                {
+                    model.Compositions.Remove(compositionToRemove);
+                }
             }
             if (model.Aggregations != null)
             {
-                model.Aggregations = model.Aggregations
-                    .Where(a => !string.Equals(a.TargetName, model.Name, StringComparison.OrdinalIgnoreCase))
+                // 如果TargetName和model.Name相同，移除该关系
+                var aggregationsToRemove = model.Aggregations
+                   .Where(a =>
+                        // 条件1：TargetName和model.Name相同
+                        string.Equals(a.TargetName, model.Name, StringComparison.OrdinalIgnoreCase) ||
+                        // 条件2：TargetName等于属性中的Type/CustomType且TargetRoleName等于属性中的Name
+                        (model.Properties != null && model.Properties.Any(p =>
+                            (string.Equals(p.Type, a.TargetName, StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(p.CustomType, a.TargetName, StringComparison.OrdinalIgnoreCase)) &&
+                            string.Equals(p.Name, a.TargetRoleName, StringComparison.OrdinalIgnoreCase)))
+                    )
                     .ToList();
+                // 移除匹配的关系
+                foreach (var aggregationToRemove in aggregationsToRemove)
+                {
+                    model.Aggregations.Remove(aggregationToRemove);
+                }
+            }
+
+            // 5、处理关联关系。
+            if (model.Associations != null)
+            {
+                // 获取所有需要移除的关系，SourceName等于当前model的Name
+                var associationsToRemove = model.Associations
+                    .Where(a =>
+                        // 先检查SourceName是否等于当前model的Name
+                        string.Equals(a.SourceName, model.Name, StringComparison.OrdinalIgnoreCase) &&
+                        // 条件1：TargetName等于属性中的Type/CustomType且TargetRoleName等于属性中的Name
+                        (model.Properties != null && model.Properties.Any(p =>
+                            (string.Equals(p.Type, a.TargetName, StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(p.CustomType, a.TargetName, StringComparison.OrdinalIgnoreCase)) &&
+                            string.Equals(p.Name, a.TargetRoleName, StringComparison.OrdinalIgnoreCase)))
+                    )
+                    .ToList();
+                // 移除匹配的关系
+                foreach (var associationToRemove in associationsToRemove)
+                {
+                    model.Associations.Remove(associationToRemove);
+                }
+
+                // 获取所有需要移除的关系，Target等于当前model的Name
+                associationsToRemove = model.Associations
+                    .Where(a =>
+                        // 先检查TargetName是否等于当前model的Name
+                        string.Equals(a.TargetName, model.Name, StringComparison.OrdinalIgnoreCase) &&
+                        // 条件1：SourceName等于属性中的Type/CustomType且SourceRoleName等于属性中的Name
+                        (model.Properties != null && model.Properties.Any(p =>
+                            (string.Equals(p.Type, a.SourceName, StringComparison.OrdinalIgnoreCase) ||
+                             string.Equals(p.CustomType, a.SourceName, StringComparison.OrdinalIgnoreCase)) &&
+                            string.Equals(p.Name, a.SourceRoleName, StringComparison.OrdinalIgnoreCase)))
+                    )
+                    .ToList();
+                // 移除匹配的关系
+                foreach (var associationToRemove in associationsToRemove)
+                {
+                    model.Associations.Remove(associationToRemove);
+                }
             }
         }
 

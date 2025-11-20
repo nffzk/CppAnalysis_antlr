@@ -126,12 +126,19 @@ namespace CppParser.Services.Implementation
                 property.Type = elementType;
                 property.CustomType = string.Empty;
                 property.Multiplicity = new Tuple<string, string>(arraySize, arraySize); // 下限、上限为数组大小
+                property.MarkMultiplicity = string.Empty;
             }
             // 如果类型为 vector<T> 或者 std:vector<T> 也算是一维度数组，将多重性设置为 *..*
             else if (IsVectorType(property.Type))
             {
                 // 对于vector类型，提取元素类型并设置多重性为 "*..*"
                 property.Multiplicity = new Tuple<string, string>("0", "*"); // 下限0、上限为*
+                property.MarkMultiplicity = string.Empty;
+            }
+            else
+            {
+                property.Multiplicity = new Tuple<string, string>("1", "1"); // 默认单值属性
+                property.MarkMultiplicity = string.Empty;
             }
 
             // 获取映射后的类型信息
