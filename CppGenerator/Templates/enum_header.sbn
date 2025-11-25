@@ -14,20 +14,20 @@
 {{- "\n\n" -}}
 /**
  * @enum {{e.Name}}
- * @brief {{e.Comment}}
+ * @brief {{e.Comment}}  /*{{e.ChineseName}}
  */
 {{- if e.IsScoped }}
 enum class {{ e.Name }}{{ if e.UnderlyingType }} : {{ e.UnderlyingType }}{{ end }}
 {
   {{- for v in e.Values }}
-  {{ v.Key }}{{ if !for.last }},{{ end }}       ///< {{v.Value}}
+  {{ v.Key }}{{ if !for.last }},{{ end }}      ///< {{v.Comment}}  /*{{v.Values}}*/
   {{- end }}
 };
 {{- else }}
 enum {{ e.Name }}{{ if e.UnderlyingType }} : {{ e.UnderlyingType }}{{ end }}
 {
   {{- for v in e.Values }}
-  {{ v.Key }}{{ if !for.last }},{{ end }}      ///< {{v.Value}}
+  {{ v.Key }}{{ if !for.last }},{{ end }}      ///< {{v.Comment}}  /*{{v.Values}}*/
   {{- end }}
 };
 {{- end }}

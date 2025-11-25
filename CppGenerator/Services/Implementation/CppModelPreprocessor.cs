@@ -361,6 +361,9 @@ namespace CppGenerator.Services
         {
             if (model.Methods == null) return;
 
+            // 删除重复的方法（同名且参数列表完全一样）
+            RemoveDuplicateMethods(model);
+
             foreach (var method in model.Methods)
             {
                 if (method.Visibility == EnumVisibility.None)
@@ -385,6 +388,71 @@ namespace CppGenerator.Services
                 }
 
             }
+        }
+
+        /// <summary>
+        /// 删除重复的方法（同名且参数列表完全一样）
+        /// </summary>
+        /// <param name="model"></param>
+        private static void RemoveDuplicateMethods(CodeClass model)
+        {
+            if (model.Methods == null || model.Methods.Count == 0) return;
+
+            var uniqueMethods = new List<CodeMethod>();
+            var seenMethodSignatures = new HashSet<string>();
+
+            foreach (var method in model.Methods)
+            {
+                // 生成方法的唯一签名：方法名 + 参数类型列表
+                string methodSignature = GetMethodSignature(method);
+
+                // 如果这个签名还没有出现过，就保留这个方法
+                if (!seenMethodSignatures.Contains(methodSignature))
+                {
+                    uniqueMethods.Add(method);
+                    seenMethodSignatures.Add(methodSignature);
+                }
+            }
+
+            // 用去重后的列表替换原列表
+            model.Methods = uniqueMethods;
+        }
+
+        /// <summary>
+        /// 生成方法的唯一签名
+        /// </summary>
+        /// <param name="method"></param>
+        /// <returns>方法签名字符串</returns>
+        private static string GetMethodSignature(CodeMethod method)
+        {
+            if (method == null) return string.Empty;
+
+            // 方法名
+            string signature = method.Name ?? "unknown";
+
+            // 参数类型列表
+            if (method.Parameters != null && method.Parameters.Count > 0)
+            {
+                var paramTypes = method.Parameters
+                    .Select(p =>
+                    {
+                        // 优先使用Type，如果Type为空则使用CustomType
+                        if (!string.IsNullOrWhiteSpace(p.Type))
+                            return p.Type.Trim();
+                        else if (!string.IsNullOrWhiteSpace(p.CustomType))
+                            return p.CustomType.Trim();
+                        else
+                            return "void"; // 默认类型
+                    })
+                    .ToArray();
+                signature += "(" + string.Join(",", paramTypes) + ")";
+            }
+            else
+            {
+                signature += "()";
+            }
+
+            return signature;
         }
 
         /// <summary>

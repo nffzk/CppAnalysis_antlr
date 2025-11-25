@@ -8,6 +8,11 @@ public:
 	int getData() const {
 		return m_data;
 	}
+
+	int getData() const {
+		return m_data;
+	}
+
 	void setData(int data) {
 		m_data = data;
 	}
