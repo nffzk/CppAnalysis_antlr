@@ -11,24 +11,25 @@ private:
 
 	//int astatic[10];
 	//void (*func)();           // 函数指针
-	int&& p;
-	mutable int mi;
-	extern int exVar;
-	const std::vector<Class1*> vec1;
-	static std::vector<Class2*> vec2;
-	volatile std::vector<Class3*> vec3;
-	int temp[5][6];
-	//void setValue(int* val);
-	//vector<int*> vec1;
-	//vector<Class1*> vec2;
-	
-	int** pp;
-	vector<vector<Class*>> vec4;
-	
-	std::map<std::string, Class1> map1;
-	const int x1;
-	static double x2;
-	volatile Class1 x3;
+	//int&& p;
+	//mutable int mi;
+	//extern int exVar;
+	//const std::vector<Class1*> vec1;
+	//static std::vector<Class2*> vec2;
+	//volatile std::vector<Class3*> vec3;
+	//int temp[5][6];
+	////void setValue(int* val);
+	//vector<int> vec1;
+	int tmp[4];
+	////vector<Class1*> vec2;
+	//
+	//int** pp;
+	//vector<vector<Class*>> vec4;
+	//
+	//std::map<std::string, Class1> map1;
+	//const int x1;
+	//static double x2;
+	//volatile Class1 x3;
 
 	//std::vector<string> strVec;
 	
@@ -45,8 +46,8 @@ public:
 	//static int x = 1;
 	//const int y = 2;
 	//mutable int z = 3;
-	virtual void func1() const;
-	virtual void func2() = 0;
+	//virtual void func1() const;
+	//virtual void func2() = 0;
 public:
 	//int test(int x) { return a; }
 	//int a;

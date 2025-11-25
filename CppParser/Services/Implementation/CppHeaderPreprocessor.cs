@@ -133,6 +133,12 @@ namespace CppParser.Services.Implementation
             // 如果类型为 vector<T> 或者 std:vector<T> 也算是一维度数组，将多重性设置为 *..*
             else if (IsVectorType(property.Type))
             {
+                string type = property.UnderlyingType.FirstOrDefault() ?? string.Empty;
+                if(type != null)
+                {
+                    property.Type = type;
+                    property.CustomType = string.Empty;
+                }
                 // 对于vector类型，提取元素类型并设置多重性为 "*..*"
                 property.Multiplicity = new Tuple<string, string>("0", "*"); // 下限0、上限为*
                 property.MarkMultiplicity = string.Empty;
