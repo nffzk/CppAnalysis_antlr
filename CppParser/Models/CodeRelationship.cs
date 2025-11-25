@@ -8,7 +8,7 @@ using CppParser.Enums;
 
 namespace CppParser.Models
 {
-    public abstract class CodeRelationship
+    public abstract class CodeRelationship : CodeElement
     {
         /// <summary>
         /// 源名（class、struct、interface类名）
@@ -105,11 +105,6 @@ namespace CppParser.Models
     /// </summary>
     public class CodeUniDirectionalAssociation : CodeRelationship
     {
-        /// <summary>
-        /// 可见性
-        /// <summary>
-        public EnumVisibility Visibility { get; set; } = EnumVisibility.Public;
-
         /// <summary>
         /// 可见性
         /// <summary>

@@ -12,13 +12,13 @@
 
 /**
  * @enum Color
- * @brief 
+ * @brief   /*
  */
 enum class Color : int
 {
-  Red,       ///< 红色
-  Green,       ///< 绿色
-  Blue       ///< 蓝色
+  Red,      ///<   /*红色*/
+  Green,      ///<   /*绿色*/
+  Blue      ///<   /*蓝色*/
 };
 
 #endif

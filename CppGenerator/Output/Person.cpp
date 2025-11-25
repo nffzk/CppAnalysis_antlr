@@ -9,12 +9,8 @@
 
 #include "Person.h"
 
-// 关联关系
-#include "Company2.h"
-#include "Company3.h"
-#include "Company4.h"
 // 单向关联关系
-#include "Company5.h"
+#include "Class1.h"
 
 Person::Person()
 {
@@ -26,7 +22,7 @@ Person::~Person()
 
 }
 
-std::string Person::getName()
+void Person::setName(int name)
 {
 
 }
@@ -35,17 +31,4 @@ void Person::setName(const std::string& v)
 {
 
 }
-
-std::string Person::staticfun()
-{
-
-}
-
-std::vector<std::string> name5;
-
-std::string name6 = "default";
-
- name7[3];
-
-class2 name8[3];
 

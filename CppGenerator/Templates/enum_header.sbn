@@ -20,14 +20,14 @@
 enum class {{ e.Name }}{{ if e.UnderlyingType }} : {{ e.UnderlyingType }}{{ end }}
 {
   {{- for v in e.Values }}
-  {{ v.Key }}{{ if !for.last }},{{ end }}      ///< {{v.Comment}}  /*{{v.Values}}*/
+  {{ v.Key }}{{ if !for.last }},{{ end }}      ///< {{v.Comment}}  /*{{v.Value}}*/
   {{- end }}
 };
 {{- else }}
 enum {{ e.Name }}{{ if e.UnderlyingType }} : {{ e.UnderlyingType }}{{ end }}
 {
   {{- for v in e.Values }}
-  {{ v.Key }}{{ if !for.last }},{{ end }}      ///< {{v.Comment}}  /*{{v.Values}}*/
+  {{ v.Key }}{{ if !for.last }},{{ end }}      ///< {{v.Comment}}  /*{{v.Value}}*/
   {{- end }}
 };
 {{- end }}

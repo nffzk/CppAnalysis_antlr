@@ -21,7 +21,7 @@ struct Node1;
 
 /**
  * @struct Node
- * @brief 
+ * @brief   //
  * @details 
  */
 struct Node
@@ -40,22 +40,22 @@ public:
 	virtual ~Node();
 	
 	/**
-	* @brief  Node 
+	* @brief   //
 	*/
 	Node left;
 	
 	/**
-	* @brief  Node 
+	* @brief   //
 	*/
 	Node right;
 	
 	/**
-	* @brief 关联关系成员变量 prev
+	* @brief 关联关系成员变量 
 	*/
 	Node2* prev;
 	
 	/**
-	* @brief 单向关联关系成员变量 next
+	* @brief 单向关联关系成员变量 
 	*/
 	Node1* next;
 

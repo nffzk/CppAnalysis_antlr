@@ -17,7 +17,7 @@
 
 /**
  * @class IShape
- * @brief 
+ * @brief   //
  * @details 
  */
 class IShape
