@@ -175,9 +175,13 @@
             {{- if m.Parameters != null && m.Parameters.size > 0 -}}
             {{- for p in m.Parameters -}}
                 {{- if !for.first }}, {{ end -}}
-                {{- ptype = (p.Type != null && p.Type.size > 0) ? p.Type : p.CustomType -}}
-                {{ ptype }} {{ p.Name }}
-            {{- end -}}
+                    {{- ptype = (p.Type != null && p.Type.size > 0) ? p.Type : p.CustomType -}}
+                    {{- if(p.DefaultValue != null && p.DefaultValue != "") -}}
+                    {{ ptype }} {{ p.Name }} = {{ p.DefaultValue }}
+                    {{- else -}}
+                    {{ ptype }} {{ p.Name }}
+                    {{- end -}}
+                 {{- end -}}
             {{- end -}}
         ){{- if m.IsPureVirtual == true && m.IsVirtual != true && m.IsStatic != true }} = 0{{ end }};
         {{- end -}}
