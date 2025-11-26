@@ -16,6 +16,7 @@
 
 // 单向关联关系
 class Class1;
+class Class1;
 
 /**
  * @struct Person
@@ -40,9 +41,12 @@ public:
 	/**
 	* @brief 
 	* @param   //
+	* @param   //
+	* @param   //
+	* @param   //
 	* @return
 	*/
-	void setName(int name);
+	void setName(double name1, int name = 10, double name1, char name2 = 'a');
 
 	/**
 	* @brief 
@@ -54,7 +58,12 @@ public:
 	/**
 	* @brief   //
 	*/
-	Class1 c1 = "Tom";
+	std::string c1 = "Tom";
+	
+	/**
+	* @brief 单向关联关系成员变量 
+	*/
+	std::vector<Class1*> c1;
 	
 	/**
 	* @brief 单向关联关系成员变量 

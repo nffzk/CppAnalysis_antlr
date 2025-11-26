@@ -239,7 +239,7 @@ namespace CppParser.Services.Implementation
                 IsScoped = enumHead.enumkey().GetText().Contains("class") ||
                           enumHead.enumkey().GetText().Contains("struct"),
                 UnderlyingType = enumHead.enumbase()?.typeSpecifierSeq()?.GetText() ?? "int",
-                Values = new Dictionary<string, string>()
+                ValueList = new List<CodeEnumValue>(),
 
             };
 
@@ -251,13 +251,15 @@ namespace CppParser.Services.Implementation
                 {
                     var enumerator = enumeratorDefinition.enumerator();
                     var valueName = enumerator.Identifier()?.GetText();
-                    if (!string.IsNullOrEmpty(valueName))
+
+                    if (!string.IsNullOrEmpty(valueName) && !codeEnum.ValueList.Any(v => v.Name == valueName))
                     {
-                        // 往枚举值字典添加枚举值，初始中文名称为空
-                        if (!codeEnum.Values.ContainsKey(valueName))
+                        codeEnum.ValueList.Add(new CodeEnumValue
                         {
-                            codeEnum.Values[valueName] = string.Empty;
-                        }
+                            Name = valueName,
+                            Label = string.Empty,
+                            Comment = string.Empty
+                        });
                     }
                 }
             }

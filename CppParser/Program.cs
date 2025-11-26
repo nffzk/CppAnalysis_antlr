@@ -10,7 +10,7 @@ class Program
     static void Main(string[] args)
     {
         // 测试文件路径
-        string testHeaderPath = @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppParser\Demo\MyClass2.h";
+        string testHeaderPath = @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppParser\Demo\MyClass4.h";
 
         if (!File.Exists(testHeaderPath))
         {
@@ -48,8 +48,14 @@ class Program
                 Console.WriteLine($"  {enumItem.Name} {(enumItem.IsScoped ? "(scoped)" : "")}");
                 if (!string.IsNullOrEmpty(enumItem.UnderlyingType))
                     Console.WriteLine($"    Underlying Type: {enumItem.UnderlyingType}");
-                if (enumItem.Values.Any())
-                    Console.WriteLine($"    Values: {string.Join(", ", enumItem.Values)}");
+                if(enumItem.ValueList.Any())
+                {
+                    Console.WriteLine("    Value List:");
+                    foreach (var val in enumItem.ValueList)
+                    {
+                        Console.WriteLine($"      {val.Name} - {val.Label} {(string.IsNullOrEmpty(val.Comment) ? "" : $"// {val.Comment}")}");
+                    }
+                }
                 Console.WriteLine();
             }
         }
@@ -121,8 +127,14 @@ class Program
                         Console.WriteLine($"  {enumItem.Name} {(enumItem.IsScoped ? "(scoped)" : "")}");
                         if (!string.IsNullOrEmpty(enumItem.UnderlyingType))
                             Console.WriteLine($"    Underlying Type: {enumItem.UnderlyingType}");
-                        if (enumItem.Values.Any())
-                            Console.WriteLine($"    Values: {string.Join(", ", enumItem.Values)}");
+                        if (enumItem.ValueList.Any())
+                        {
+                            Console.WriteLine("    Value List:");
+                            foreach (var val in enumItem.ValueList)
+                            {
+                                Console.WriteLine($"      {val.Name} - {val.Label} {(string.IsNullOrEmpty(val.Comment) ? "" : $"// {val.Comment}")}");
+                            }
+                        }
                         Console.WriteLine();
                     }
                 }

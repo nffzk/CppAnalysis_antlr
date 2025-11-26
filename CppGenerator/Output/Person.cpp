@@ -11,6 +11,7 @@
 
 // 单向关联关系
 #include "Class1.h"
+#include "Class1.h"
 
 Person::Person()
 {
@@ -22,7 +23,7 @@ Person::~Person()
 
 }
 
-void Person::setName(int name)
+void Person::setName(double name1, int name, double name1, char name2)
 {
 
 }

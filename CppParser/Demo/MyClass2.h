@@ -20,7 +20,8 @@ private:
 	//int temp[5][6];
 	////void setValue(int* val);
 	//vector<int> vec1;
-	int tmp[4];
+	//int tmp[4];
+	void func1(int a = 1, double b);
 	////vector<Class1*> vec2;
 	//
 	//int** pp;

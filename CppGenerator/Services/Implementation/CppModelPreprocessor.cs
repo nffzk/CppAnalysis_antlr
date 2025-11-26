@@ -195,35 +195,28 @@ namespace CppGenerator.Services
             model.Name = SanitizeName(model.Name, "UnnamedEnum");
 
             // 处理枚举值字典
-            if (model.Values != null)
+            if (model.ValueList != null)
             {
-                var cleanedValues = new Dictionary<string, string>();
-
-                foreach (var kvp in model.Values)
+                var cleanedValueList = new List<CodeEnumValue>();
+                for (int i = 0; i < model.ValueList.Count; i++)
                 {
-                    // 清理键（枚举值）
-                    var cleanedKey = CleanupEnumKey(kvp.Key);
-                    if (string.IsNullOrWhiteSpace(cleanedKey))
+                    var enumValue = model.ValueList[i];
+                    if (enumValue == null) continue;
+                    var cleanedKey = CleanupEnumKey(enumValue.Name);
+                    if (cleanedKey == null) continue; // 跳过无效的键
+                    var cleanedValue = CleanupEnumValue(enumValue.Label);
+                    cleanedValueList.Add(new CodeEnumValue
                     {
-                        continue; // 跳过无效的键
-                    }
-
-                    // 清理值（中文名称）
-                    var cleanedValue = CleanupEnumValue(kvp.Value);
-
-                    // 避免重复键（使用不区分大小写的比较）
-                    if (!cleanedValues.Keys.Any(k =>
-                        string.Equals(k, cleanedKey, StringComparison.OrdinalIgnoreCase)))
-                    {
-                        cleanedValues[cleanedKey] = cleanedValue;
-                    }
+                        Name = cleanedKey,
+                        Label = cleanedValue,
+                        Comment = enumValue.Comment // 保留注释
+                    });
                 }
-
-                model.Values = cleanedValues;
+                model.ValueList = cleanedValueList;
             }
             else
             {
-                model.Values = new Dictionary<string, string>();
+                model.ValueList = new List<CodeEnumValue>();
             }
 
             // 处理底层类型
@@ -350,6 +343,29 @@ namespace CppGenerator.Services
                 {
                     property.Type = MapTypeToCpp(property.Type.Trim());
                 }
+                // 处理默认值的格式化
+                FormatPropertyDefaultValue(property);
+            }
+        }
+
+        /// <summary>
+        /// 格式化属性的默认值（根据类型添加引号等）
+        /// </summary>
+        /// <param name="property">要处理的属性</param>
+        private static void FormatPropertyDefaultValue(CodeProperty property)
+        {
+            if (property == null || string.IsNullOrWhiteSpace(property.DefaultValue))
+                return;
+
+            string defaultValue = property.DefaultValue.Trim();
+
+            if (property.Type == "string" || property.Type == "std::string")
+            {
+                property.DefaultValue = $"\"{defaultValue}\"";
+            }
+            else if (property.Type == "char")
+            {
+                property.DefaultValue = $"\'{defaultValue}\'";
             }
         }
 
@@ -384,9 +400,9 @@ namespace CppGenerator.Services
                         {
                             parameter.Type = MapTypeToCpp(parameter.Type.Trim());
                         }
+                        FormatPropertyDefaultValue(parameter);
                     }
                 }
-
             }
         }
 
