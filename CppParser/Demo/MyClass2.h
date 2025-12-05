@@ -1,4 +1,5 @@
-﻿class MyClass :public MyBaseClass
+﻿#define noexplict1  noexcept       // 为 int 创建别名 INTEGER
+class MyClass :public MyBaseClass
 {
 private:
 	//const int m_id,c;
@@ -21,7 +22,7 @@ private:
 	////void setValue(int* val);
 	//vector<int> vec1;
 	//int tmp[4];
-	void func1(int a = 1, double b);
+	MyClass(int x) noexcept;
 	////vector<Class1*> vec2;
 	//
 	//int** pp;

@@ -4,13 +4,14 @@ using System.Linq;
 using CppParser.Services;
 using CppParser.Models;
 using CppParser.Services.Implementation;
+using SharpCompress.Common;
 
 class Program
 {
     static void Main(string[] args)
     {
         // 测试文件路径
-        string testHeaderPath = @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppParser\Demo\MyClass4.h";
+        string testHeaderPath = @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppParser\Demo\MyClass7.h";
 
         if (!File.Exists(testHeaderPath))
         {
@@ -22,7 +23,25 @@ class Program
         try
         {
             var parser = new CppHeaderParser();
-            var headerFile = parser.ParseHeaderFile(testHeaderPath);
+
+            var content = File.ReadAllText(testHeaderPath);
+
+            // 提取头文件中的macros
+            CppMacroDefinitionCollection macros = CppMacroExtractor.Extract(content);
+
+            // 显示提取的宏
+            Console.WriteLine("=== Extracted Macros ===");
+            foreach (var macro in macros.Macros)
+            {
+                Console.WriteLine($"#define {macro.Value.Name} {macro.Value.Value}");
+            }
+
+            // 执行宏替换
+            var cppMacroReplacer = new CppMacroReplacer();
+            content = cppMacroReplacer.ReplaceMacrosInHeader(content, macros);
+
+
+            var headerFile = parser.ParseHeaderContent(content, Path.GetFileName(testHeaderPath));
 
             DisplayHeaderFileInfo(headerFile);
         }

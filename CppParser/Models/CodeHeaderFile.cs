@@ -22,6 +22,10 @@ namespace CppParser.Models
         /// 文件中的枚举列表
         /// </summary>
         public List<CodeEnum> Enums { get; set; } = new List<CodeEnum>();
-        // public List<string> Includes { get; set; } = new List<string>();
+
+        /// <summary>
+        /// 文件中的宏定义集合
+        /// </summary>
+        public CppMacroDefinitionCollection MacroDefinitions { get; set; } = new CppMacroDefinitionCollection();
     }
 }
