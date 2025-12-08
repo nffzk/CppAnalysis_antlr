@@ -61,6 +61,25 @@ namespace CppParser.Models
         public string Value { get; set; }
 
         /// <summary>
+        /// 完整的宏定义指令文本
+        /// </summary>
+        public string FullInstruction
+        {
+            get
+            {
+                if (IsFunctionLike)
+                {
+                    var paramsStr = string.Join(",", Parameters);
+                    return $"#define {Name}({paramsStr}) {Value}";
+                }
+                else
+                {
+                    return $"#define {Name} {Value}";
+                }
+            }
+        }
+
+        /// <summary>
         /// 宏参数列表（对于带参数的宏）。例如：#define MAX(a,b) max(a,b)中的参数列表为 a,b
         /// </summary>
         public List<string> Parameters { get; set; } = new List<string>();
@@ -68,7 +87,7 @@ namespace CppParser.Models
         /// <summary>
         /// 是否为函数式宏（带参数）
         /// </summary>
-        public bool IsFunctionLike => Parameters.Count > 0;
+        public bool IsFunctionLike { get; set; } = false;
     }
 
 }

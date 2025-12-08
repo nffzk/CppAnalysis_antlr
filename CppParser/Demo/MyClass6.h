@@ -18,11 +18,13 @@
 	} while (0)
 
 
-#include <string>  #define PI 3.14159  #define MAX1(a,b) ((a)>(b)?(a):(b))
+#define PI 3.14159  
+#define MAX1(a,b) ((a)>(b)?(a):(b))
 class Buffer {
 private:
     char data[MAX_BUFFER_SIZE];
     int timeout = DEFAULT_TIMEOUT;
+	int pi = PI;
 
 public:
     int getMaxSize() {

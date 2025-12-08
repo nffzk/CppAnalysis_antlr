@@ -6,7 +6,7 @@
 #define MAX1(a,b) ((a)>(b)?(a):(b))
 class Buffer {
 	double area = MAX(5,12,4);  
-
+	//double pi = PI;
 };
 
 

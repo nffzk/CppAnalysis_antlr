@@ -326,6 +326,7 @@ namespace CppParser.Services
             {
                 Name = name,
                 Value = value,
+                IsFunctionLike = true,
             };
 
             // 解析参数
@@ -382,6 +383,7 @@ namespace CppParser.Services
             {
                 Name = name,
                 Value = value,
+                IsFunctionLike = false
             };
         }
 

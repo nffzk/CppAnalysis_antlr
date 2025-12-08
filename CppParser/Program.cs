@@ -11,7 +11,8 @@ class Program
     static void Main(string[] args)
     {
         // 测试文件路径
-        string testHeaderPath = @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppParser\Demo\MyClass7.h";
+        string testHeaderPath = @"D:\work\learn\tools\vs\CppAnalysis_antlr\CppParser\Demo\test1.h";
+        // 
 
         if (!File.Exists(testHeaderPath))
         {
@@ -33,17 +34,18 @@ class Program
             Console.WriteLine("=== Extracted Macros ===");
             foreach (var macro in macros.Macros)
             {
-                Console.WriteLine($"#define {macro.Value.Name} {macro.Value.Value}");
+                Console.WriteLine(macro.Value.FullInstruction);
             }
 
             // 执行宏替换
-            var cppMacroReplacer = new CppMacroReplacer();
-            content = cppMacroReplacer.ReplaceMacrosInHeader(content, macros);
+            //var cppMacroReplacer = new CppMacroReplacer();
+            //content = cppMacroReplacer.ReplaceMacrosInHeader(content, macros);
 
+            // 词法分析和语法分析
+            //Console.WriteLine(content);
+            //var headerFile = parser.ParseHeaderContent(content, Path.GetFileName(testHeaderPath));
 
-            var headerFile = parser.ParseHeaderContent(content, Path.GetFileName(testHeaderPath));
-
-            DisplayHeaderFileInfo(headerFile);
+            //DisplayHeaderFileInfo(headerFile);
         }
         catch (Exception ex)
         {
